@@ -229,10 +229,20 @@ server.post("/create-blog", async (req, res, next) => {
     }
 }, async (req, res) => {
     const authorId = req.user
+    const id = req.body?.id
     var { title, des, tags, content, banner, draft } = req.body
-    //validation
-    console.log(content)
-    tags = tags.map(t =>
+    if (id) {
+        const blogg = await Blog.findOneAndUpdate({blog_id:id},{
+            title, des, tags, content, banner, draft : Boolean(draft)
+        })  
+        if (!blogg) {
+            return res.json({"error":`No blog with Name ${id} exists`})
+        }else{
+            return res.json(blogg)
+        }
+
+    } else {
+        tags = tags.map(t =>
         t.toLowerCase()
     )
 
@@ -250,9 +260,11 @@ server.post("/create-blog", async (req, res, next) => {
     } catch (error) {
         console.log(error.message)
     }
+    }
+    
 })
 server.post("/get-blogs", async (req, res) => {
-    const { pageCurrent } = req.body;
+    const pageCurrent = req.body?.pageCurrent
 
     const maxLimit = 5;
     let count;
@@ -373,11 +385,16 @@ server.post("/get-profile", (req, res, next) => {
 })
 server.post("/get-blog-info",async(req,res)=>{
     const {blog_id} = req.body;
-    const incVal = 1
+    const draft = req.body?.draft
+    const mode = req.body?.mode || "read"
+    const incVal = mode=="edit"? 0 : 1
     try {
         const bloginfo = await Blog.findOneAndUpdate({blog_id},{
              $inc:{"activity.total_reads": incVal }
         }).populate("author","personal_info.fullname personal_info.username personal_info.profile_img").select("title des banner content blog_id tags publishedAt activity")
+        if (bloginfo.draft && !draft) {
+            return res.json({"error":`The requested blog is not a draft blog`})
+        }
         if(bloginfo){
             await User.findOneAndUpdate({"personal_info.username":bloginfo.author.personal_info.username},{
                 $inc:{
