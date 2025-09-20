@@ -19,25 +19,26 @@ export const BlogStructure = {
 export const BlogContext = createContext({})
 
 const BlogPage = ()=>{
-const [similarBlogs,setSimilarBlogs] = useState([BlogStructure])
-const {blog_id} = useParams()
-const [blog,setBlog] = useState(BlogStructure)
-const [loading,setLoading] = useState(true)
-let {title,des,content,tags,author:{personal_info:{fullname,username:author_username,profile_img}},banner,publishedAt,activity:{total_likes,total_reads,total_comments,total_parent_comments}} = blog 
+    const [blog,setBlog] = useState(BlogStructure)
+    let {title,des,content,tags,author:{personal_info:{fullname,username:author_username,profile_img}},banner,publishedAt,activity:{total_likes,total_reads,total_comments,total_parent_comments}} = blog 
+    const [similarBlogs,setSimilarBlogs] = useState([BlogStructure])
+    const {blog_id} = useParams()
+    const [loading,setLoading] = useState(true)
+    let [likes,setLikes] = useState(total_likes)
+    let [like,setLike] = useState(true);
 const fetchBlogs = async()=>{
     try {
-       const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
+        const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
             blog_id
         })
-
-       
-            if (Object.entries(blog).length) {
+      
+        
+        if (Object.entries(data).length) {
+            setBlog(data.data)
             
-                setBlog(data.data)
-                
-                setLoading(false)
-            }
-
+            setLoading(false)
+        }
+        
         
         console.log(data)
     } catch (error) {
@@ -55,16 +56,17 @@ const fetchSimilarBlogs = async()=>{
 
 useEffect(()=>{
     
-        fetchBlogs()
-   
-        setLoading(false)
-
+    fetchBlogs()
     
-            
+    setLoading(false)
+    
+    
+    
 },[blog_id])
 useEffect(()=>{
-     
+    
     fetchSimilarBlogs()
+
 },[blog])
 
     return(
@@ -72,7 +74,7 @@ useEffect(()=>{
         <Toaster/>
             {
                 loading ? <Loader/>:
-                 <BlogContext.Provider value={{blog,setBlog}} >
+                 <BlogContext.Provider value={{blog,setBlog,likes,setLikes,like,setLike}} >
                     <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
                     
                     <img src={banner} className="aspect-video" />

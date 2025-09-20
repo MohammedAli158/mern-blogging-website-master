@@ -14,7 +14,7 @@ import { getSessionStorage } from "../common/session";
     const user = JSON.parse(getSessionStorage("user"))
     const access_token = user.access_token
     const navigate = useNavigate()
-    const {editorState,setEditorState,blog:{title,content,tags,banner,des},setBlog,blog
+    const {editorState,setEditorState,blog:{content,title,tags,banner,des},setBlog,blog
     } = useContext(EditorContext);
     const handleTitleOnChange =(e)=>{
         let input = e.target
@@ -77,9 +77,6 @@ import { getSessionStorage } from "../common/session";
                  'Authorization' : `Bearer ${access_token}`
              }
          })
-         if (res.data.error) {
-             return toast.error(res.data.error)
-         }
          if (res) { 
             toast.dismiss(loadint)
             toast.success("The Blog has been Created")

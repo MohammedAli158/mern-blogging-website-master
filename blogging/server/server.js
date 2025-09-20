@@ -67,7 +67,7 @@ const generateUsername = async (email) => {
 }
 const SendFrontEnd = (user) => {
     const access_token = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_TOKEN_SECRET, { expiresIn: process.env.JWT_EXPIRY });
-    
+
 
     return {
         access_token,
@@ -232,37 +232,38 @@ server.post("/create-blog", async (req, res, next) => {
     const id = req.body?.id
     var { title, des, tags, content, banner, draft } = req.body
     if (id) {
-        const blogg = await Blog.findOneAndUpdate({blog_id:id},{
-            title, des, tags, content, banner, draft : Boolean(draft)
-        })  
-        if (blogg=={}) {
-            console.log ("inside if")
-            return res.json({error:`No blog with Name ${id} exists`})
-        }else{
+        const blogg = await Blog.findOneAndUpdate({ blog_id: id }, {
+            title, des, tags, content, banner, draft: Boolean(draft)
+        })
+        if (blogg) {
+            console.log("inside if")
+            return res.json(blogg
+            )
+        } else {
             return res.json(blogg)
         }
 
     } else {
         tags = tags.map(t =>
-        t.toLowerCase()
-    )
+            t.toLowerCase()
+        )
 
-    let blog_id = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, "-").trim() + nanoid();
-    let blog = new Blog({
-        title, des, tags, banner, content, author: authorId, blog_id, draft: Boolean(draft)
-    })
-    var incVal = draft ? 0 : 1
-    
-    try {
-        const bl = await blog.save();
-        const user = await User.findOneAndUpdate({ _id: authorId }, { $inc: { "account_info.total_posts": incVal }, $push: { "blogs": bl._id } })
+        let blog_id = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, "-").trim() + nanoid();
+        let blog = new Blog({
+            title, des, tags, banner, content, author: authorId, blog_id, draft: Boolean(draft)
+        })
+        var incVal = draft ? 0 : 1
 
-        return res.json(req.body)
-    } catch (error) {
-        console.log(error.message)
+        try {
+            const bl = await blog.save();
+            const user = await User.findOneAndUpdate({ _id: authorId }, { $inc: { "account_info.total_posts": incVal }, $push: { "blogs": bl._id } })
+
+            return res.json(req.body)
+        } catch (error) {
+            console.log(error.message)
+        }
     }
-    }
-    
+
 })
 server.post("/get-blogs", async (req, res) => {
     const pageCurrent = req.body?.pageCurrent
@@ -299,51 +300,51 @@ server.get("/trending-blogs", async (req, res) => {
 const escapeRegex = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 server.post("/search-blogs", async (req, res) => {
-  const { tag, _id, query,eliminate_blog } = req.body || {};
-  const pageCurrent = Math.max(1, parseInt(req.body?.pageCurrent, 10) || 1);
-  const maxLimit = 5;
+    const { tag, _id, query, eliminate_blog } = req.body || {};
+    const pageCurrent = Math.max(1, parseInt(req.body?.pageCurrent, 10) || 1);
+    const maxLimit = 5;
 
-  try {
-    const filters = { draft: false };
-    const or = [];
+    try {
+        const filters = { draft: false };
+        const or = [];
 
-    if (query && String(query).trim()) {
-      const q = new RegExp(escapeRegex(String(query).trim()), "i");
-      or.push({ tags: q });         // matches any element in tags array
-      or.push({ title: q });        // optional: search title
-      or.push({ des: q });          // optional: search description
+        if (query && String(query).trim()) {
+            const q = new RegExp(escapeRegex(String(query).trim()), "i");
+            or.push({ tags: q });         // matches any element in tags array
+            or.push({ title: q });        // optional: search title
+            or.push({ des: q });          // optional: search description
+        }
+
+        if (tag && String(tag).trim()) {
+            or.push({ tags: new RegExp(escapeRegex(String(tag).trim()), "i") });
+        }
+
+
+        if (_id && mongoose.Types.ObjectId.isValid(_id)) {
+            or.push({ author: new mongoose.Types.ObjectId(_id) });
+        }
+        if (eliminate_blog) {
+            filters.blog_id = { $ne: eliminate_blog }
+        }
+        if (or.length) filters.$or = or;
+
+
+
+        const count = await Blog.countDocuments(filters);
+        const pageCount = Math.ceil(count / maxLimit);
+
+        const blogs = await Blog.find(filters)
+            .populate("author", "personal_info.fullname personal_info.profile_img personal_info.username -_id")
+            .sort({ publishedAt: -1 })
+            .select("blog_id title des banner activity tags publishedAt -_id")
+            .skip((pageCurrent - 1) * maxLimit)
+            .limit(maxLimit);
+
+        return res.status(200).json({ blogs, pageCount });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: error.message || error });
     }
-
-    if (tag && String(tag).trim()) {
-      or.push({ tags: new RegExp(escapeRegex(String(tag).trim()), "i") });
-    }
-    console.log(_id,"is id")
-
-    if (_id && mongoose.Types.ObjectId.isValid(_id)) {
-      or.push({ author: new mongoose.Types.ObjectId(_id) });
-    }
-    if (eliminate_blog) {
-        filters.blog_id = { $ne: eliminate_blog}
-    }
-    if (or.length) filters.$or = or;
-
-    console.log("Mongo filters:", JSON.stringify(filters)); // debug
-
-    const count = await Blog.countDocuments(filters);
-    const pageCount = Math.ceil(count / maxLimit);
-
-    const blogs = await Blog.find(filters)
-      .populate("author", "personal_info.fullname personal_info.profile_img personal_info.username -_id")
-      .sort({ publishedAt: -1 })
-      .select("blog_id title des banner activity tags publishedAt -_id")
-      .skip((pageCurrent - 1) * maxLimit)
-      .limit(maxLimit);
-    console.log(blogs)
-    return res.status(200).json({ blogs, pageCount });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: error.message || error });
-  }
 });
 
 server.post("/search-users", async (req, res) => {
@@ -360,11 +361,10 @@ server.post("/search-users", async (req, res) => {
 
 })
 server.post("/get-profile", (req, res, next) => {
-    console.log("Incoming:", req.method, req.url, req.body);
+
     next();
 }, async (req, res) => {
     const { Username } = req.body
-    console.log(Username)
     try {
         const profile = await User.findOne({ "personal_info.username": Username.trim() }).select("-personal_info.password ").populate({
             path: "blogs",
@@ -372,7 +372,7 @@ server.post("/get-profile", (req, res, next) => {
             select: "title des banner",
             options: { sort: { publishedAt: -1 } }
         })
-      
+
         if (profile) {
             return res.json({ profile })
         }
@@ -384,24 +384,54 @@ server.post("/get-profile", (req, res, next) => {
 
 
 })
-server.post("/get-blog-info",async(req,res)=>{
-    const {blog_id} = req.body;
+server.post("/get-blog-info", async (req, res) => {
+    const { blog_id } = req.body;
     const draft = req.body?.draft
     const mode = req.body?.mode || "read"
-    const incVal = mode=="edit"? 0 : 1
+    const incVal = mode == "edit" ? 0 : 1
+    const like = req.body?.like
+   
+    
     try {
-        const bloginfo = await Blog.findOneAndUpdate({blog_id},{
-             $inc:{"activity.total_reads": incVal }
-        }).populate("author","personal_info.fullname personal_info.username personal_info.profile_img").select("title des banner content blog_id tags publishedAt activity")
-        if (bloginfo.draft && !draft) {
-            return res.json({"error":`The requested blog is not a draft blog`})
-        }
-        if(bloginfo){
-            await User.findOneAndUpdate({"personal_info.username":bloginfo.author.personal_info.username},{
-                $inc:{
-                    "account_info.total_reads" : incVal
+        const bloginfo = await Blog.findOneAndUpdate({ blog_id }, {
+            $inc: { "activity.total_reads": incVal }
+        }).populate("author", "personal_info.fullname personal_info.username personal_info.profile_img").select("title des banner content blog_id tags publishedAt activity")
+        
+
+        if (bloginfo) {
+            await User.findOneAndUpdate({ "personal_info.username": bloginfo.author.personal_info.username }, {
+                $inc: {
+                    "account_info.total_reads": incVal,"account_info.total_likes":like
                 }
             })
+            console.log("inside if")
+            
+            if (bloginfo.draft && !draft) {
+                return res.json({ "error": `The requested blog is not a draft blog` })
+            }
+            return res.json(bloginfo)
+    }
+         else {
+            console.log("inside else")
+
+            console.log("returning bloginfo")
+
+
+            const bloginfo =  {
+                title: 'No title ',
+                des: 'No description ',
+                content: [],
+                tags: [],
+                author: { personal_info: { fullname: 'noname ', username: 'noface ', profile_img: ' ' } },
+                banner: ' https://www.shutterstock.com/image-illustration/horror-creepy-ward-room-hospital-260nw-1573755883.jpg',
+                publishedAt: '2006-03-01T00:00:00.000Z',
+                activity: {
+                    total_likes: 0,
+                    total_reads: 0,
+                    total_comments: 0,
+                    total_parent_comments: 0
+                }
+            }
             return res.json(bloginfo)
         }
     } catch (error) {
