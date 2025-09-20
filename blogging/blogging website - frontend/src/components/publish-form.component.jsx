@@ -5,11 +5,12 @@ import { EditorContext } from "../pages/editor.pages"
 import Tag from "./tags.component";
 import { Toaster,toast } from "react-hot-toast";
 import { UserContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios"
 import { getSessionStorage } from "../common/session";
 
  const PublishForm = ()=>{
+    const {blog_id} = useParams()
     const user = JSON.parse(getSessionStorage("user"))
     const access_token = user.access_token
     const navigate = useNavigate()
@@ -70,13 +71,15 @@ import { getSessionStorage } from "../common/session";
         const blogdata = {
             title,des,content,tags,banner
         }
-        console.log(tags,"two")
        try {
-         const res = await axios.post(import.meta.env.VITE_SERVER_PATH + "/create-blog",blogdata,{
+         const res = await axios.post(import.meta.env.VITE_SERVER_PATH + "/create-blog",{...blogdata,id:blog_id},{
              headers:{
                  'Authorization' : `Bearer ${access_token}`
              }
          })
+         if (res.data.error) {
+             return toast.error(res.data.error)
+         }
          if (res) {
             toast.dismiss(loadint)
             toast.success("The Blog has been Created")

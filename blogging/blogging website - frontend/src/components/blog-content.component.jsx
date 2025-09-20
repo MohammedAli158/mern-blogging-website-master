@@ -21,6 +21,18 @@ const BlogContent = ({block})=>{
             </div>
         )
     }
+    const List = ({style,items})=>{
+        return (
+            <ol className={ style == "ordered" ? "list-decimal": " list-" } >
+                {
+                    items.map(listItem,i=>{
+                        return <li dangerouslySetInnerHTML={{__html:listItem}} ></li>
+                    })
+                }
+            </ol>
+        )
+
+    }
     let{type,data} = block
     if (type=="paragraph") {
         return (
@@ -43,6 +55,9 @@ const BlogContent = ({block})=>{
     }
     if (type=="quote") {
      return <Quote quote={data.quote} caption={data.caption} />   
+    }
+    if (type=="list") {
+     return <List style={data.style} items={data.items} />   
     }
 }
 export default BlogContent

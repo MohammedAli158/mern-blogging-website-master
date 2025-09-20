@@ -1,6 +1,6 @@
 import AnimationWrapper from "../common/page-animation"
 import logo from "../imgs/logo.png"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import defaultBanner from "../imgs/blog banner.png"
 import EditorJS from "@editorjs/editorjs"
 import axios from 'axios'
@@ -13,14 +13,16 @@ import { getSessionStorage } from "../common/session"
 
 
 const BlogEditor = ()=>{
+    const blog_id = useParams()
      const navigate =useNavigate()
      const user = JSON.parse(getSessionStorage("user"))
         const access_token = user.access_token
     const {blog,blog:{title,content,des,tags,banner},setBlog,textEditor,setTextEditor,setEditorState} = useContext(EditorContext)
+    //
     useEffect(()=>{
         setTextEditor( new EditorJS({
             "holder" : "textEditor",
-            "data":content,
+            "data": Array.isArray(content)? content[0] :content,
             "placeholder":"Give your ideas a Virtual Existence",
             "tools" : tools,
             "defaultBlock": 'paragraph'
@@ -60,7 +62,7 @@ const BlogEditor = ()=>{
        setBlog({...blog,title:e.target.value})
     }
     const handlePublish =()=>{
-        if(!banner.length){
+        if(!banner){
             return toast.error("Please Upload a banner")
         }
         if(!title.length){
@@ -70,7 +72,6 @@ const BlogEditor = ()=>{
             textEditor.save().then(data=>{
                 
                 if(data.blocks.length){
-                    console.log(data)
                     setBlog({...blog, content: data})
                     setEditorState("Publish")
                 }else{
@@ -89,7 +90,7 @@ const BlogEditor = ()=>{
             title,des,content,tags,banner,draft:true
         }
         try {
-         const res = await axios.post(import.meta.env.VITE_SERVER_PATH + "/create-blog",blogdata,{
+         const res = await axios.post(import.meta.env.VITE_SERVER_PATH + "/create-blog",{...blogdata,id:blog_id},{
              headers:{
                  'Authorization' : `Bearer ${access_token}`
              }
