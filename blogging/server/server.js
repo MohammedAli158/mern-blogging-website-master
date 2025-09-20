@@ -23,7 +23,7 @@ const __dirname = path.dirname(__filename);
 
 const AdminSecret = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, path.resolve(process.env.FIREBASE_ADMIN_CRED)),
+        path.join(__dirname, process.env.FIREBASE_ADMIN_CRED),
         "utf-8"
     )
 );
@@ -235,8 +235,9 @@ server.post("/create-blog", async (req, res, next) => {
         const blogg = await Blog.findOneAndUpdate({blog_id:id},{
             title, des, tags, content, banner, draft : Boolean(draft)
         })  
-        if (!blogg) {
-            return res.json({"error":`No blog with Name ${id} exists`})
+        if (blogg=={}) {
+            console.log ("inside if")
+            return res.json({error:`No blog with Name ${id} exists`})
         }else{
             return res.json(blogg)
         }

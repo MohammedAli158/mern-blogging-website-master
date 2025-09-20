@@ -7,8 +7,14 @@ import { getFullDay } from "../common/date"
 import BlogInteraction from "../components/blog-interaction.component"
 import BlogPostCard from "../components/blog-post.component"
 import BlogContent from "../components/blog-content.component"
+import toast, { Toaster } from "react-hot-toast"
 export const BlogStructure = {
-    title : '',des:'',content:[],tags:[],author:{personal_info:{fullname:'',username:'',profile_img:''}},banner:'',publishedAt:''
+    title : '',des:'',content:[],tags:[],author:{personal_info:{fullname:'',username:'',profile_img:''}},banner:'',publishedAt:'',activity: {
+      total_likes: 0,
+      total_comments: 0,
+      total_reads: 0,
+      total_parent_comments: 0
+    }
 }
 export const BlogContext = createContext({})
 
@@ -17,18 +23,23 @@ const [similarBlogs,setSimilarBlogs] = useState([BlogStructure])
 const {blog_id} = useParams()
 const [blog,setBlog] = useState(BlogStructure)
 const [loading,setLoading] = useState(true)
-let {title,des,content,tags,author:{personal_info:{fullname,username:author_username,profile_img}},banner,publishedAt} = blog
+let {title,des,content,tags,author:{personal_info:{fullname,username:author_username,profile_img}},banner,publishedAt,activity:{total_likes,total_reads,total_comments,total_parent_comments}} = blog 
 const fetchBlogs = async()=>{
     try {
        const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
             blog_id
         })
-        if (data) {
-            setBlog(data.data)
 
-            setLoading(false)
+       
+            if (Object.entries(blog).length) {
+            
+                setBlog(data.data)
+                
+                setLoading(false)
+            }
 
-        }
+        
+        console.log(data)
     } catch (error) {
         console.log(error)
         setLoading(false)
@@ -40,22 +51,25 @@ const fetchSimilarBlogs = async()=>{
     })
     setSimilarBlogs(sim.data.blogs)
 }
-const resetStates = ()=>{
-    setBlog(BlogStructure)
-    setLoading(true)
-    setSimilarBlogs([BlogStructure])
-}
+
 
 useEffect(()=>{
-    resetStates()
-    fetchBlogs()
     
+        fetchBlogs()
+   
+        setLoading(false)
+
+    
+            
 },[blog_id])
 useEffect(()=>{
+     
     fetchSimilarBlogs()
 },[blog])
+
     return(
         <AnimationWrapper>
+        <Toaster/>
             {
                 loading ? <Loader/>:
                  <BlogContext.Provider value={{blog,setBlog}} >
@@ -75,9 +89,9 @@ useEffect(()=>{
                  </div>
                 <BlogInteraction/>
                 {
-                    content[0].blocks.map((block,i)=>{
+                    content.length ? content[0].blocks.map((block,i)=>{
                         return <BlogContent block={block} key={i}  className="my-4 md:my-9"/>
-                    })
+                    }) : ""
                 }
                 <BlogInteraction/>
                 {

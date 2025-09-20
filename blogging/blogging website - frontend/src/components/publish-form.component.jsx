@@ -80,7 +80,7 @@ import { getSessionStorage } from "../common/session";
          if (res.data.error) {
              return toast.error(res.data.error)
          }
-         if (res) {
+         if (res) { 
             toast.dismiss(loadint)
             toast.success("The Blog has been Created")
             

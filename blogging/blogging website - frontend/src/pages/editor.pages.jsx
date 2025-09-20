@@ -29,9 +29,14 @@ const Editor = () =>{
         axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
             blog_id, draft:true , mode:'edit'
         }).then(({data})=>{
+            if (Object.entries(data).length === 0){
+            console.log("Not exists")
+            return toast.error("The blog doesn't exist")
+        }
             setBlog(data)
             setLoading(false)
         }).catch(err=>{
+            console.log(err)
             setLoading(false)
             setBlog(null)
         })
