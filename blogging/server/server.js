@@ -23,7 +23,7 @@ const __dirname = path.dirname(__filename);
 
 const AdminSecret = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, "../server/react-js-blogging-websit-d2b6e-firebase-adminsdk-fbsvc-650f9e73ab.json"),
+        path.join(__dirname, path.resolve(process.env.FIREBASE_ADMIN_CRED)),
         "utf-8"
     )
 );
