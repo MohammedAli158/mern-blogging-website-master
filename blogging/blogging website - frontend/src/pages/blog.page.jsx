@@ -31,16 +31,17 @@ const fetchBlogs = async()=>{
         const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
             blog_id
         })
+        
       
         
-        if (Object.entries(data).length) {
+        if (data) {
             setBlog(data.data)
             
             setLoading(false)
         }
         
         
-        console.log(data)
+        
     } catch (error) {
         console.log(error)
         setLoading(false)
@@ -66,6 +67,7 @@ useEffect(()=>{
 useEffect(()=>{
     
     fetchSimilarBlogs()
+
 
 },[blog])
 

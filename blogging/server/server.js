@@ -14,7 +14,7 @@ import { fileURLToPath } from "url";
 import { createClient } from "@supabase/supabase-js"
 import multer from "multer";
 import { nanoid } from "nanoid";
-
+import Notification from "../server/Schema/Notification.js"
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 
@@ -56,6 +56,27 @@ const upload = multer({ storage });
 
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+
+const VerifyJWt = async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (token == null) {
+        return res.status(401).json({ "error": "user does not exist" })
+    }
+    if (token) {
+        const access_token = token
+        try {
+            const authorized = jwt.verify(access_token, process.env.JWT_ACCESS_TOKEN_SECRET)
+            req.user = authorized.id
+            next();
+        } catch (error) {
+            console.log(error.message)
+            return res.status(401).json({ "error": "user is not authorized to access this type of request" })
+        }
+
+    }
+    
+}
 
 const generateUsername = async (email) => {
     let username = email.split("@")[0];
@@ -209,25 +230,7 @@ server.post('/editor', upload.fields([
 
     })
 
-server.post("/create-blog", async (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(" ")[1];
-    if (token == null) {
-        return res.status(401).json({ "error": "user does not exist" })
-    }
-    if (token) {
-        const access_token = token
-        try {
-            const authorized = jwt.verify(access_token, process.env.JWT_ACCESS_TOKEN_SECRET)
-            req.user = authorized.id
-            next();
-        } catch (error) {
-            console.log(error.message)
-            return res.status(401).json({ "error": "user is not authorized to access this type of request" })
-        }
-
-    }
-}, async (req, res) => {
+server.post("/create-blog",VerifyJWt , async (req, res) => {
     const authorId = req.user
     const id = req.body?.id
     var { title, des, tags, content, banner, draft } = req.body
@@ -236,7 +239,7 @@ server.post("/create-blog", async (req, res, next) => {
             title, des, tags, content, banner, draft: Boolean(draft)
         })
         if (blogg) {
-            console.log("inside if")
+           
             return res.json(blogg
             )
         } else {
@@ -389,33 +392,32 @@ server.post("/get-blog-info", async (req, res) => {
     const draft = req.body?.draft
     const mode = req.body?.mode || "read"
     const incVal = mode == "edit" ? 0 : 1
-    const like = req.body?.like
+    
    
     
     try {
         const bloginfo = await Blog.findOneAndUpdate({ blog_id }, {
             $inc: { "activity.total_reads": incVal }
         }).populate("author", "personal_info.fullname personal_info.username personal_info.profile_img").select("title des banner content blog_id tags publishedAt activity")
-        
+       
 
         if (bloginfo) {
             await User.findOneAndUpdate({ "personal_info.username": bloginfo.author.personal_info.username }, {
                 $inc: {
-                    "account_info.total_reads": incVal,"account_info.total_likes":like
+                    "account_info.total_reads": incVal
                 }
             })
-            console.log("inside if")
+           
             
             if (bloginfo.draft && !draft) {
                 return res.json({ "error": `The requested blog is not a draft blog` })
             }
+           
             return res.json(bloginfo)
     }
          else {
-            console.log("inside else")
-
-            console.log("returning bloginfo")
-
+           
+           
 
             const bloginfo =  {
                 title: 'No title ',
@@ -437,4 +439,22 @@ server.post("/get-blog-info", async (req, res) => {
     } catch (error) {
         return res.json(error)
     }
+})
+server.post("/like-info",VerifyJWt ,async (req, res) => {
+    const user_id = req.user
+    const _id = req.body?._id
+    console.log(user_id,"user id",_id,"Blog id")
+    
+    const notification = await Notification.findOne({blog : new mongoose.Types.ObjectId(_id),user:new mongoose.Types.ObjectId(user_id)})
+    let like=true,likes;
+    console.log(notification)
+    if (notification) {
+        console.log("notficiaio find")
+        like = false
+    }
+     likes = await Blog.findOne({_id:_id}).select("activity.total_likes")
+     if (likes) {
+      
+        return res.json({"like":like,"likes":likes.activity.total_likes})
+     }
 })

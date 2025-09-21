@@ -3,5 +3,6 @@ node_modules/
 dist/
 build/
 .DS_Store
+blogging/server/public/temp
 blogging/blogging website - frontend/src/common/firebase.jsx
 blogging/server/react-js-blogging-websit-d2b6e-firebase-adminsdk-fbsvc-650f9e73ab.json

@@ -9,31 +9,36 @@ import { useEffect } from "react";
 import axios from "axios";
 
 const BlogInteraction = ()=>{
-    let {blog:{title,blog_id,activity:{total_likes,total_comments},author:{personal_info:{username:author_username}}},setBlog,like,setLike,likes,setLikes} = useContext(BlogContext);
+    let {blog,blog:{_id,title,blog_id,activity:{total_likes,total_comments},author:{personal_info:{username:author_username}}},setBlog,like,setLike,likes,setLikes} = useContext(BlogContext);
 
     let {userAuth:{username,access_token}} = useContext(UserContext) 
-const handleLike = (e)=>{
     const user = JSON.parse(getSessionStorage("user"))  
-  if (!user.access_token) {
-      
-      return toast.error("Please login in order to Like") 
+     
+
+const fetchLikeInfo = async () =>{
+    try {
+        const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/like-info",{
+            _id : _id
+        },{
+            headers:{
+                Authorization : `Bearer ${user?.access_token}`
+            }
+        }) 
+        console.log("hel")
+        if (data) {
+           setLike(data.data.like)
+           console.log(data.data.like)
+            setLikes(data.data.likes)
+        }
+    } catch (error) {
+        console.log(error)
     }
-    setLike(prev=>!prev) 
-     if (like) {
-     setBlog({...blog,activity:{total_likes : total_likes+1}})
-     setLikes(likes+1)
-     const already_liked = true;
-     axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
+};
 
-     })
-     
-   }else{
-     
-setLikes (likes-1)
-
-   }
-}
-
+useEffect(() => {
+    fetchLikeInfo() 
+   
+}, [_id]);
 
 
 
@@ -43,7 +48,7 @@ setLikes (likes-1)
         <hr className="my-2 border-grey"/>
         <div className="flex gap-6 justify-between" >
             <div className="flex gap-3 items-center" >
-                <button className={`w-10 h-10 rounded-full flex items-center justify-center bg-grey/80 `} onClick={handleLike} >
+                <button className={`w-10 h-10 rounded-full flex items-center justify-center bg-grey/80 `}  >
                     <i className={`fi fi`+ (!like ? '-sr-heart text-red': "-rr-heart " ) } />
                 </button>
                 <p>{likes}</p>
