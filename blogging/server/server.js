@@ -446,39 +446,67 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
     const dec = req.body?.dec
     console.log(user_id,"user id",_id,"Blog id")
     
-    const notification = await Notification.findOne({blog : new mongoose.Types.ObjectId(_id),user:new mongoose.Types.ObjectId(user_id)})
+    const notification = await Notification.findOne({blog : _id,user:user_id})
     let like=true,likes;
     console.log(notification)
     if (notification) {
+       
         console.log("notficiaio find")
         like = false
         //click->unclick
         if (dec) {
-           await  notification.deleteOne()
-           return res.json({"res":"like removed successfully"})
-        }
-    }else{
-        //unclick->click
-        console.log("updating likes")
-        const updatedLikes = await Blog.findOneAndUpdate({_id : _id},{
+           const a = await Notification.deleteOne({_id:notification._id}) 
+           console.log("deleted successfully") 
+           const bl= await Blog.findOneAndUpdate({_id : _id},{
              $inc:{
-                "activity.total_likes": 1
+                "activity.total_likes": -1
              }
         },{new:true})
-        console.log(updatedLikes)
-        if (updatedLikes) {
-            const notif = new Notification({
-                blog: _id,
-                notification_for : updatedLikes.author,
-                user:user_id,
-                type:"like"
-            })
-            await notif.save()
-            return res.json({likes: updatedLikes.activity.total_likes,like:false})
+            console.log (bl.activity.total_likes,"like count") 
+            
+            likes = bl.activity.total_likes
+            return res.json({like:true,likes:bl.activity.total_likes})
+        }
+       const bl= await Blog.findOneAndUpdate({_id : _id},{
+             $inc:{
+                "activity.total_likes": 0
+             }
+        },{new:true})
+            console.log (bl.activity.total_likes,"like count") 
+            
+            likes = bl.activity.total_likes
+            return res.json({like:false,likes:bl.activity.total_likes})
+
+    } 
+    
+    else{
+        //unclick->click
+        if (dec=="false") {
+            console.log("unclick se click",dec)
+            
+            const updatedLikes = await Blog.findOneAndUpdate({_id : _id},{
+                $inc:{
+                    "activity.total_likes": 1
+                }
+            },{new:true})
+            console.log(updatedLikes)
+            if (updatedLikes) {
+                const notif = new Notification({
+                    blog: _id,
+                    notification_for : updatedLikes.author,
+                    user:user_id,
+                    type:"like"
+                })
+                await notif.save()
+                console.log ("unclick se click") 
+                return res.json({likes: updatedLikes.activity.total_likes,like:false})
+            }
         }
 
         
+        
     }
+
     likes = await Blog.findOne({_id:_id}).select("activity.total_likes")
         if (likes) {
             

@@ -16,6 +16,7 @@ const BlogInteraction = ()=>{
      
 
 const fetchLikeInfo = async () =>{
+    
     try {
         const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/like-info",{
             _id : _id
@@ -24,30 +25,58 @@ const fetchLikeInfo = async () =>{
                 Authorization : `Bearer ${user?.access_token}`
             }
         }) 
-        console.log("hel")
+        
         if (data) {
+           console.log(data, "data is fetched")
            setLike(data.data.like)
-           console.log(data.data.like)
             setLikes(data.data.likes)
+        }else{
+            console.log("data is nul")
         }
+
     } catch (error) {
         console.log(error)
     }
 };
 const handleLikeClick  = async (e) =>{
+    if(!user){
+        return toast.error("Please log in to like")
+    }
+
+
     setLike (prev=>!prev)
     if (like) { //not already liked , unclick->click
         console.log("sending like req")
         try {
             const res = await axios.post(import.meta.env.VITE_SERVER_PATH+"/like-info",{
-                _id : _id,dec:false
+                _id : _id, dec : "false"
             },{
                 headers:{
                     Authorization : `Bearer ${user?.access_token}`
                 }
             })
             if (res) {
-                console.log (res.data) 
+                console.log (res.data)
+                setLike (res.data?.like)  
+                setLikes (res.data?.likes) 
+            }
+        } catch (error) {
+            
+        }
+    }else{
+       
+        try {
+            const res = await axios.post(import.meta.env.VITE_SERVER_PATH+"/like-info",{
+                _id : _id,dec:true
+            },{
+                headers:{
+                    Authorization : `Bearer ${user?.access_token}`
+                }
+            })
+            if (res) {
+                console.log ("remove likes",res.data) 
+                setLike(res.data.like) 
+                setLikes(res.data.likes) 
             }
         } catch (error) {
             
