@@ -443,6 +443,7 @@ server.post("/get-blog-info", async (req, res) => {
 server.post("/like-info",VerifyJWt ,async (req, res) => {
     const user_id = req.user
     const _id = req.body?._id
+    const dec = req.body?.dec
     console.log(user_id,"user id",_id,"Blog id")
     
     const notification = await Notification.findOne({blog : new mongoose.Types.ObjectId(_id),user:new mongoose.Types.ObjectId(user_id)})
@@ -451,10 +452,37 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
     if (notification) {
         console.log("notficiaio find")
         like = false
+        //click->unclick
+        if (dec) {
+           await  notification.deleteOne()
+           return res.json({"res":"like removed successfully"})
+        }
+    }else{
+        //unclick->click
+        console.log("updating likes")
+        const updatedLikes = await Blog.findOneAndUpdate({_id : _id},{
+             $inc:{
+                "activity.total_likes": 1
+             }
+        },{new:true})
+        console.log(updatedLikes)
+        if (updatedLikes) {
+            const notif = new Notification({
+                blog: _id,
+                notification_for : updatedLikes.author,
+                user:user_id,
+                type:"like"
+            })
+            await notif.save()
+            return res.json({likes: updatedLikes.activity.total_likes,like:false})
+        }
+
+        
     }
-     likes = await Blog.findOne({_id:_id}).select("activity.total_likes")
-     if (likes) {
-      
-        return res.json({"like":like,"likes":likes.activity.total_likes})
-     }
+    likes = await Blog.findOne({_id:_id}).select("activity.total_likes")
+        if (likes) {
+            
+            return res.json({"like":like,"likes":likes.activity.total_likes})
+        }
+     
 })

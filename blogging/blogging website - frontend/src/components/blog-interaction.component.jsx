@@ -34,6 +34,26 @@ const fetchLikeInfo = async () =>{
         console.log(error)
     }
 };
+const handleLikeClick  = async (e) =>{
+    setLike (prev=>!prev)
+    if (like) { //not already liked , unclick->click
+        console.log("sending like req")
+        try {
+            const res = await axios.post(import.meta.env.VITE_SERVER_PATH+"/like-info",{
+                _id : _id,dec:false
+            },{
+                headers:{
+                    Authorization : `Bearer ${user?.access_token}`
+                }
+            })
+            if (res) {
+                console.log (res.data) 
+            }
+        } catch (error) {
+            
+        }
+    }
+}
 
 useEffect(() => {
     fetchLikeInfo() 
@@ -48,7 +68,7 @@ useEffect(() => {
         <hr className="my-2 border-grey"/>
         <div className="flex gap-6 justify-between" >
             <div className="flex gap-3 items-center" >
-                <button className={`w-10 h-10 rounded-full flex items-center justify-center bg-grey/80 `}  >
+                <button className={`w-10 h-10 rounded-full flex items-center justify-center bg-grey/80 `} onClick={handleLikeClick} value={like} >
                     <i className={`fi fi`+ (!like ? '-sr-heart text-red': "-rr-heart " ) } />
                 </button>
                 <p>{likes}</p>
