@@ -15,6 +15,7 @@ import { createClient } from "@supabase/supabase-js"
 import multer from "multer";
 import { nanoid } from "nanoid";
 import Notification from "../server/Schema/Notification.js"
+import Comment from "../server/Schema/Comment.js"
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 
@@ -513,4 +514,31 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
             return res.json({"like":like,"likes":likes.activity.total_likes})
         }
      
+})
+server.post("/add-comment",VerifyJWt,async(req,res)=>{
+    let user_id = req.user
+    let {_id,blog_author,comment} = req.body
+    let commentObj = new Comment({
+        blog_id:_id,blog_author,comment,commented_by:user_id
+    })
+    const savedComment = await commentObj.save()
+    if (savedComment) {
+        let Bloga = await Blog.findOneAndUpdate({_id},{$push:{"comments":savedComment._id},$inc:{
+            "activity.total_comments":1,"activity.total_parent_comments":1
+        }})
+            if (Bloga) {
+                
+                let notification = new Notification({
+                    type:"comment",
+                    blog:_id,
+                    notification_for:blog_author,
+                    user:user_id,
+                    comment:savedComment._id
+                })
+                const savedNotification = await notification.save()
+                
+            }
+
+    }
+    return res.json({comment,commentedAt:savedComment.commentedAt,_id:savedComment._id,user_id,children:savedComment.children})
 })

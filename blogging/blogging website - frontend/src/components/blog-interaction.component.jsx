@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import axios from "axios";
 
 const BlogInteraction = ()=>{
-    let {blog,blog:{_id,title,blog_id,activity:{total_likes,total_comments},author:{personal_info:{username:author_username}}},setBlog,like,setLike,likes,setLikes} = useContext(BlogContext);
+    let {blog,blog:{_id,title,blog_id,activity:{total_likes,total_comments},author:{personal_info:{username:author_username}}},setBlog,like,setLike,likes,setLikes,commentsVisible,setCommentsVisible,totalParentComments,setTotalParentComment} = useContext(BlogContext);
 
     let {userAuth:{username,access_token}} = useContext(UserContext) 
     const user = JSON.parse(getSessionStorage("user"))  
@@ -102,7 +102,7 @@ useEffect(() => {
                 </button>
                 <p>{likes}</p>
             
-                <button className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80" >
+                <button className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80" onClick={()=>setCommentsVisible(prev=>!prev)} >
                     <i className="fi fi-rr-comment-dots" />
                 </button>
                 <p>{total_comments}</p>

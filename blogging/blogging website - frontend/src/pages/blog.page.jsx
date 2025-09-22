@@ -8,6 +8,7 @@ import BlogInteraction from "../components/blog-interaction.component"
 import BlogPostCard from "../components/blog-post.component"
 import BlogContent from "../components/blog-content.component"
 import toast, { Toaster } from "react-hot-toast"
+import CommentContainer from "../components/comments.component"
 export const BlogStructure = {
     title : '',des:'',content:[],tags:[],author:{personal_info:{fullname:'',username:'',profile_img:''}},banner:'',publishedAt:'',activity: {
       total_likes: 0,
@@ -20,12 +21,14 @@ export const BlogContext = createContext({})
 
 const BlogPage = ()=>{
     const [blog,setBlog] = useState(BlogStructure)
-    let {title,des,content,tags,author:{personal_info:{fullname,username:author_username,profile_img}},banner,publishedAt,activity:{total_likes,total_reads,total_comments,total_parent_comments}} = blog 
+    let {title,des,content,tags,author:{_id,personal_info:{fullname,username:author_username,profile_img}},banner,publishedAt,activity:{total_likes,total_reads,total_comments,total_parent_comments}} = blog 
     const [similarBlogs,setSimilarBlogs] = useState([BlogStructure])
     const {blog_id} = useParams()
     const [loading,setLoading] = useState(true)
     let [likes,setLikes] = useState(total_likes)
     let [like,setLike] = useState(true);
+    let[commentsVisible,setCommentsVisible] = useState(false)
+    let [totalParentComments,setTotalParentComments] = useState(0)
 const fetchBlogs = async()=>{
     try {
         const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
@@ -76,7 +79,8 @@ useEffect(()=>{
         <Toaster/>
             {
                 loading ? <Loader/>:
-                 <BlogContext.Provider value={{blog,setBlog,likes,setLikes,like,setLike}} >
+                <BlogContext.Provider value={{blog,setBlog,likes,setLikes,like,setLike,commentsVisible,setCommentsVisible,totalParentComments,setTotalParentComments}} >
+                     <CommentContainer />
                     <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
                     
                     <img src={banner} className="aspect-video" />
