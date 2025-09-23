@@ -16,6 +16,7 @@ import multer from "multer";
 import { nanoid } from "nanoid";
 import Notification from "../server/Schema/Notification.js"
 import Comment from "../server/Schema/Comment.js"
+import CommentInterface from "./CommentClass.js";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 
@@ -541,4 +542,80 @@ server.post("/add-comment",VerifyJWt,async(req,res)=>{
 
     }
     return res.json({comment,commentedAt:savedComment.commentedAt,_id:savedComment._id,user_id,children:savedComment.children})
+})
+server.post("/add-reply",VerifyJWt,async(req,res)=>{
+    const user_id = req.user
+    const {parent_comment_id , blog_id , blog_author , comment} = req.body
+    //finding parent comment 
+    const temp = await Comment.findOne({_id:parent_comment_id})
+    const for_user = temp.commented_by
+    const reply = new Comment({
+        blog_id,blog_author,comment,commented_by:user_id,isReply:true,parent:parent_comment_id
+    })
+    const savedreply = await reply.save()
+    const ParentComment = await Comment.findOneAndUpdate({_id:parent_comment_id},{
+        $push:{children:savedreply._id}
+    })
+    if (ParentComment) {
+        const notif = new Notification({
+            type:"reply",blog:blog_id,notification_for:for_user,user:user_id,comment:savedreply._id
+        })
+        const notifsaved = await notif.save()
+        if (notifsaved) {
+            const BlogUpdation = await Blog.findOneAndUpdate({_id:blog_id},{
+                $inc:{
+                    "activity.total_comments" : 1
+                }
+            })
+        }
+    }
+})
+server.post("fetch-comments",VerifyJWt, async(req,res)=>{
+    let user_id = req.user
+    const {blog_id} =req.body
+    const comments = await Blog.findOne({_id:blog_id}).select("comments")
+    const CommentCards = []
+    const children = []
+    if (comments) {
+        
+        for (let i = 0; i < array.length; i++) {
+            CommentCards[i] = await Comment.findOne({_id:comments[i]})
+            let commentedbyarray = CommentCards.map(async(com,i)=>{
+               let u = await User.findOne({_id:com.commented_by})
+               return u.personal_info
+            })
+            const objects = CommentCards.map((commentt,i)=>{
+                return new CommentInterface({
+                     comment_id:commentt._id, comment_content:commentt.comment, commented_at:commentt.commented_at, commented_by:{
+                        profile_img:commentedbyarray[i].profile_img,
+                        username : commentedbyarray[i].username,
+                        fullname:commentedbyarray[i].fullname
+                     }
+                })
+            })
+          if (CommentCards[i].children) {
+            let commentedbyarrayc = CommentCards[i].children.map(async(com,i)=>{
+            let u = await User.findOne({_id:com.commented_by})
+             return u.personal_info
+        })
+        let childrendata =  CommentCards[i].children.map(async(commentt,i)=>{
+         let child = await Comment.findOne ({_id : commentt})
+         return child
+        })
+        let childrenobjects = CommentCards[i].childrendata.map((commentt,i)=>{
+            return new CommentInterface({
+                 comment_id:commentt._id, comment_content:commentt.comment, commented_at:commentt.commented_at, commented_by:{
+                    profile_img:commentedbyarrayc[i].profile_img,
+                    username : commentedbyarrayc[i].username,
+                    fullname:commentedbyarrayc[i].fullname
+                 }
+            })
+        })
+        objects[i].children = childrenobjects
+
+          }
+          
+        }
+    }
+
 })
