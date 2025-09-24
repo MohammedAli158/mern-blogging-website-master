@@ -2,7 +2,29 @@ import { useState } from "react"
 import { BlogContext } from "../pages/blog.page"
 import { useContext } from "react"
 import CommentField from "./comment-field.component"
+import axios from "axios"
+import { comment } from "postcss"
+export const fetchComments = async({blog_id,skip,setTotalParentCommentFun,comment_array = null}) => {
+    let res;
+    let resp = await axios.post(import.meta.env.VITE_SERVER_PATH+"/fetch-comments",{
+        blog_id,skip
+    })
+    if (resp) {
+        resp.data.map((comment)=>{
+            comment.childrenLevel = 0;
+        })
+        if (comment_array==null) {
+            res={results : resp.data}
+        }else{
+            let dati = resp.data
+            res= {results : [...comment_array,...dati
+            ]}
+        }
+    }
+    setTotalParentCommentFun(prev=>prev+1)
+    return res
 
+}
 const CommentContainer = () => {
     let {blog:{title} ,commentsVisible, setCommentsVisible, totalParentComments, setTotalParentComment } = useContext(BlogContext)
     console.log(commentsVisible)

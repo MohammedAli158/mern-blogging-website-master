@@ -15,10 +15,13 @@ const App = () => {
     useEffect( ()=>{
         const user= JSON.parse(getSessionStorage("user"));
         if(user){
+           
             setUserAuth(user);
+            console.log(userAuth,"this si ")
+            
         }else{
             
-            setUserAuth({access_token : null})
+            setUserAuth({...userAuth,access_token : null})
         }
         
     }

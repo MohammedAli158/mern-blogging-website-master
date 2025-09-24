@@ -398,9 +398,9 @@ server.post("/get-blog-info", async (req, res) => {
    
     
     try {
-        const bloginfo = await Blog.findOneAndUpdate({ blog_id }, {
+        const bloginfo = await Blog.findOneAndUpdate({ blog_id:blog_id }, {
             $inc: { "activity.total_reads": incVal }
-        }).populate("author", "personal_info.fullname personal_info.username personal_info.profile_img").select("title des banner content blog_id tags publishedAt activity")
+        }).populate("author", "personal_info.fullname personal_info.username personal_info.profile_img").select("title des banner content blog_id tags publishedAt activity _id")
        
 
         if (bloginfo) {
@@ -421,7 +421,7 @@ server.post("/get-blog-info", async (req, res) => {
            
            
 
-            const bloginfo =  {
+            let bloginfo =  {
                 title: 'No title ',
                 des: 'No description ',
                 content: [],
@@ -453,7 +453,7 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
     console.log(notification)
     if (notification) {
        
-        console.log("notficiaio find")
+       
         like = false
         //click->unclick
         if (dec) {
@@ -464,7 +464,7 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
                 "activity.total_likes": -1
              }
         },{new:true})
-            console.log (bl.activity.total_likes,"like count") 
+           
             
             likes = bl.activity.total_likes
             return res.json({like:true,likes:bl.activity.total_likes})
@@ -474,7 +474,7 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
                 "activity.total_likes": 0
              }
         },{new:true})
-            console.log (bl.activity.total_likes,"like count") 
+           
             
             likes = bl.activity.total_likes
             return res.json({like:false,likes:bl.activity.total_likes})
@@ -570,52 +570,20 @@ server.post("/add-reply",VerifyJWt,async(req,res)=>{
         }
     }
 })
-server.post("fetch-comments",VerifyJWt, async(req,res)=>{
-    let user_id = req.user
-    const {blog_id} =req.body
-    const comments = await Blog.findOne({_id:blog_id}).select("comments")
-    const CommentCards = []
-    const children = []
-    if (comments) {
-        
-        for (let i = 0; i < array.length; i++) {
-            CommentCards[i] = await Comment.findOne({_id:comments[i]})
-            let commentedbyarray = CommentCards.map(async(com,i)=>{
-               let u = await User.findOne({_id:com.commented_by})
-               return u.personal_info
-            })
-            const objects = CommentCards.map((commentt,i)=>{
-                return new CommentInterface({
-                     comment_id:commentt._id, comment_content:commentt.comment, commented_at:commentt.commented_at, commented_by:{
-                        profile_img:commentedbyarray[i].profile_img,
-                        username : commentedbyarray[i].username,
-                        fullname:commentedbyarray[i].fullname
-                     }
-                })
-            })
-          if (CommentCards[i].children) {
-            let commentedbyarrayc = CommentCards[i].children.map(async(com,i)=>{
-            let u = await User.findOne({_id:com.commented_by})
-             return u.personal_info
-        })
-        let childrendata =  CommentCards[i].children.map(async(commentt,i)=>{
-         let child = await Comment.findOne ({_id : commentt})
-         return child
-        })
-        let childrenobjects = CommentCards[i].childrendata.map((commentt,i)=>{
-            return new CommentInterface({
-                 comment_id:commentt._id, comment_content:commentt.comment, commented_at:commentt.commented_at, commented_by:{
-                    profile_img:commentedbyarrayc[i].profile_img,
-                    username : commentedbyarrayc[i].username,
-                    fullname:commentedbyarrayc[i].fullname
-                 }
-            })
-        })
-        objects[i].children = childrenobjects
-
-          }
-          
-        }
+server.post("/fetch-comments", async(req,res)=>{
+   let {blog_id,skip} = req.body;
+   
+   let maxLimit = 5
+   try {
+    const resp = await Comment.find({blog_id,isReply:false}).populate("commented_by","personal_info.profile_img personal_info.username personal_info.fullname").skip(skip).limit(maxLimit).sort({
+        'commentedAt' : -1
+    })
+    if (resp) {
+        console.log(resp,"this is the resp")
+        return res.json(resp)
     }
-
+   } catch (error) {
+    console.log(error.message)
+    return res.json(error)
+   }
 })

@@ -24,8 +24,9 @@ const UserAuthForm = ({type})=> {
         const userData = response.data;
 
         setSessionStorage("user", JSON.stringify(userData));
-        
+       
         setUserAuth(userData);
+        
         
         // If you want to navigate after login success
         // navigate("/");

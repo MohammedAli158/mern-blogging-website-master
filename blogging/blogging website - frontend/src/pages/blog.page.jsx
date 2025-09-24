@@ -8,7 +8,7 @@ import BlogInteraction from "../components/blog-interaction.component"
 import BlogPostCard from "../components/blog-post.component"
 import BlogContent from "../components/blog-content.component"
 import toast, { Toaster } from "react-hot-toast"
-import CommentContainer from "../components/comments.component"
+import CommentContainer, { fetchComments } from "../components/comments.component"
 export const BlogStructure = {
     title : '',des:'',content:[],tags:[],author:{personal_info:{fullname:'',username:'',profile_img:''}},banner:'',publishedAt:'',activity: {
       total_likes: 0,
@@ -35,11 +35,12 @@ const fetchBlogs = async()=>{
             blog_id
         })
         
-      
         
         if (data) {
+            blog.comments = await fetchComments ({blog_id:data.data._id,setTotalParentCommentFun:setTotalParentComments}) 
+            console.log(blog,"this is sblog")
             setBlog(data.data)
-            
+            console.log(blog,"this is sblog")
             setLoading(false)
         }
         
@@ -68,7 +69,7 @@ useEffect(()=>{
     
 },[blog_id])
 useEffect(()=>{
-    
+    // fetchBlogs()
     fetchSimilarBlogs()
 
 

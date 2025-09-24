@@ -7,26 +7,41 @@ import { BlogContext } from "../pages/blog.page"
 import { UserContext } from "../App"
 
 const CommentField = ({action})=>{
-    const {blog:{_id,author:{_id:blog_author}}} = useContext(BlogContext)
-    const {user:{access_token,profile_img,username,fullname}} = useContext(UserContext)
+    const {blog,blog:{_id,author:{_id:blog_author},comments,activity,activity:{total_comments,total_parent_comments}},setBlog,setTotalParentComments } = useContext(BlogContext)
+const {userAuth,userAuth:{access_token,profile_img,username,fullname}}=useContext(UserContext)
+
     let [comment,setComment] = useState("")
     const handleCommentClick = async()=>{
-        if (!user.access_token) {
+       
+        if (!access_token) {
             return toast.error("Please Log in first")
         }
         if (comment.length==0) {
             return toast.error("Please write something before submitting")
         }
+        
         try {
+        
             const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/add-comment",{
                 _id,blog_author,comment
             },{
                 headers:{
-                    Authorization:`Bearer ${user?.access_token}`
+                    Authorization:`Bearer ${access_token}`
                 }
             })
+           
             if (data) {
-                console.log(data)
+                data.data.commented_by = {personal_info:{profile_img,fullname,username}}
+                setComment("")
+                data.data.childrenLevel = 0
+                let newCommentArr = [data.data]
+                let parentCommentIncrementVal = 1
+                setBlog({...blog,comments:{...comments,results:newCommentArr},activity:{...activity,total_comments:total_comments+1,total_parent_comments : total_parent_comments+parentCommentIncrementVal}})
+                setTotalParentComments(prev=>prev+1)
+
+              
+            }else{
+                console.log("data not found")
             }
         } catch (error) {
             console.log(error)
