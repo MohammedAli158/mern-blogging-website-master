@@ -32,14 +32,12 @@ const BlogPage = ()=>{
 const fetchBlogs = async()=>{
     try {
         const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
-            blog_id
+            blog_id:blog_id
         })
-        
-        
-        if (data) {
-            blog.comments = await fetchComments ({blog_id:data.data._id,setTotalParentCommentFun:setTotalParentComments}) 
-            console.log(blog,"this is sblog")
-            setBlog(data.data)
+        if (data) { 
+            blog.comments = await fetchComments ({blog_id:data.data._id,setTotalParentCommentFun:setTotalParentComments})
+            let ali = data.data
+            setBlog({...blog,...ali})
             console.log(blog,"this is sblog")
             setLoading(false)
         }

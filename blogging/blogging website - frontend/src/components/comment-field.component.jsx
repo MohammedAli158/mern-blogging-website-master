@@ -7,7 +7,10 @@ import { BlogContext } from "../pages/blog.page"
 import { UserContext } from "../App"
 
 const CommentField = ({action})=>{
-    const {blog,blog:{_id,author:{_id:blog_author},comments,activity,activity:{total_comments,total_parent_comments}},setBlog,setTotalParentComments } = useContext(BlogContext)
+    const {blog:{_id,author:{_id:blog_author},comments,activity,activity:{total_comments,total_parent_comments}},setBlog,setTotalParentComments } = useContext(BlogContext)
+    const {blog} = useContext (BlogContext)
+    let commentArr = blog?.comments?.results
+    
 const {userAuth,userAuth:{access_token,profile_img,username,fullname}}=useContext(UserContext)
 
     let [comment,setComment] = useState("")
@@ -34,7 +37,7 @@ const {userAuth,userAuth:{access_token,profile_img,username,fullname}}=useContex
                 data.data.commented_by = {personal_info:{profile_img,fullname,username}}
                 setComment("")
                 data.data.childrenLevel = 0
-                let newCommentArr = [data.data]
+                let newCommentArr = [data.data,...commentArr]
                 let parentCommentIncrementVal = 1
                 setBlog({...blog,comments:{...comments,results:newCommentArr},activity:{...activity,total_comments:total_comments+1,total_parent_comments : total_parent_comments+parentCommentIncrementVal}})
                 setTotalParentComments(prev=>prev+1)

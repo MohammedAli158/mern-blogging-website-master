@@ -401,19 +401,20 @@ server.post("/get-blog-info", async (req, res) => {
         const bloginfo = await Blog.findOneAndUpdate({ blog_id:blog_id }, {
             $inc: { "activity.total_reads": incVal }
         }).populate("author", "personal_info.fullname personal_info.username personal_info.profile_img").select("title des banner content blog_id tags publishedAt activity _id")
-       
-
+        
+        
         if (bloginfo) {
             await User.findOneAndUpdate({ "personal_info.username": bloginfo.author.personal_info.username }, {
                 $inc: {
                     "account_info.total_reads": incVal
                 }
             })
-           
+            
             
             if (bloginfo.draft && !draft) {
                 return res.json({ "error": `The requested blog is not a draft blog` })
             }
+            console.log("returnign bloginfo",bloginfo)
            
             return res.json(bloginfo)
     }
