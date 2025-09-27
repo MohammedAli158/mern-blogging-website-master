@@ -279,7 +279,7 @@ server.post("/get-blogs", async (req, res) => {
         count = await Blog.countDocuments()
         let pageCount = Math.ceil(count / maxLimit)
         const blogs = await Blog.find({ draft: false }).populate("author", "personal_info.fullname personal_info.profile_img personal_info.username -_id").sort({ "publishedAt": -1 }).select("blog_id title des banner activity tags publishedAt -_id").skip((pageCurrent - 1) * maxLimit).limit(maxLimit)
-        // console.log(JSON.stringify(blogs, null, 2));
+   
 
         if (blogs) {
             return res.status(200).json({ blogs, pageCount })
@@ -414,7 +414,7 @@ server.post("/get-blog-info", async (req, res) => {
             if (bloginfo.draft && !draft) {
                 return res.json({ "error": `The requested blog is not a draft blog` })
             }
-            console.log("returnign bloginfo",bloginfo)
+     
            
             return res.json(bloginfo)
     }
@@ -451,7 +451,7 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
     
     const notification = await Notification.findOne({blog : _id,user:user_id})
     let like=true,likes;
-    console.log(notification)
+   
     if (notification) {
        
        
@@ -459,7 +459,7 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
         //click->unclick
         if (dec) {
            const a = await Notification.deleteOne({_id:notification._id}) 
-           console.log("deleted successfully") 
+      
            const bl= await Blog.findOneAndUpdate({_id : _id},{
              $inc:{
                 "activity.total_likes": -1
@@ -485,14 +485,14 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
     else{
         //unclick->click
         if (dec=="false") {
-            console.log("unclick se click",dec)
+          
             
             const updatedLikes = await Blog.findOneAndUpdate({_id : _id},{
                 $inc:{
                     "activity.total_likes": 1
                 }
             },{new:true})
-            console.log(updatedLikes)
+           
             if (updatedLikes) {
                 const notif = new Notification({
                     blog: _id,
@@ -501,7 +501,7 @@ server.post("/like-info",VerifyJWt ,async (req, res) => {
                     type:"like"
                 })
                 await notif.save()
-                console.log ("unclick se click") 
+               
                 return res.json({likes: updatedLikes.activity.total_likes,like:false})
             }
         }
@@ -547,19 +547,25 @@ server.post("/add-comment",VerifyJWt,async(req,res)=>{
 server.post("/add-reply",VerifyJWt,async(req,res)=>{
     const user_id = req.user
     const {parent_comment_id , blog_id , blog_author , comment} = req.body
+    let replyingTo = parent_comment_id
     //finding parent comment 
+    console.log(parent_comment_id,"parent coment id") 
     const temp = await Comment.findOne({_id:parent_comment_id})
+   
     const for_user = temp.commented_by
     const reply = new Comment({
         blog_id,blog_author,comment,commented_by:user_id,isReply:true,parent:parent_comment_id
     })
+    if (replyingTo) {
+        reply.parent = replyingTo
+    }
     const savedreply = await reply.save()
     const ParentComment = await Comment.findOneAndUpdate({_id:parent_comment_id},{
         $push:{children:savedreply._id}
     })
     if (ParentComment) {
         const notif = new Notification({
-            type:"reply",blog:blog_id,notification_for:for_user,user:user_id,comment:savedreply._id
+            type:"reply",blog:blog_id,notification_for:for_user,user:user_id,comment:savedreply._id,replied_on_comment:replyingTo
         })
         const notifsaved = await notif.save()
         if (notifsaved) {
@@ -570,6 +576,7 @@ server.post("/add-reply",VerifyJWt,async(req,res)=>{
             })
         }
     }
+    return res.json(savedreply)
 })
 server.post("/fetch-comments", async(req,res)=>{
    let {blog_id,skip} = req.body;
@@ -580,11 +587,34 @@ server.post("/fetch-comments", async(req,res)=>{
         'commentedAt' : -1
     })
     if (resp) {
-        console.log(resp,"this is the resp")
         return res.json(resp)
     }
    } catch (error) {
     console.log(error.message)
+    return res.json(error)
+   }
+})
+server.post("/fetch-replies",async(req,res)=>{
+    let {_id,skip} = req.body
+    let maxLimit = 5
+   try {
+     let comment = await Comment.findOne({_id}).populate({
+         path:'children',
+         option:{
+             limit:maxLimit,
+             skip:skip,
+             sort:{commentedAt : -1}
+         },
+        populate:{
+         path:'commented_by',
+         select:"personal_info.fullname personal_info.username personal_info.profile_img"
+        },
+        select:"-blog_id -updatedAt"
+     })
+     if (comment) {
+         return res.json(comment.children)
+     }
+   } catch (error) {
     return res.json(error)
    }
 })

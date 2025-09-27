@@ -38,7 +38,7 @@ const fetchBlogs = async()=>{
             blog.comments = await fetchComments ({blog_id:data.data._id,setTotalParentCommentFun:setTotalParentComments})
             let ali = data.data
             setBlog({...blog,...ali})
-            console.log(blog,"this is sblog")
+          
             setLoading(false)
         }
         

@@ -27,8 +27,7 @@ const fetchLikeInfo = async () =>{
         }) 
         
         if (data) {
-           console.log(data, "data is fetched")
-           setLike(data.data.like)
+     setLike(data.data.like)
             setLikes(data.data.likes)
         }else{
             console.log("data is nul")
