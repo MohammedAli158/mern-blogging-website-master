@@ -6,7 +6,7 @@ import axios from "axios"
 import { BlogContext } from "../pages/blog.page"
 import { UserContext } from "../App"
 
-const CommentField = ({ action, index, replyingTo, setIsReplying }) => {
+const CommentField = ({ action, index, replyingTo, setIsReplying,setChildLengthState }) => {
     const { blog: { _id, author: { _id: blog_author }, comments, activity, activity: { total_comments, total_parent_comments } }, setBlog, setTotalParentComments } = useContext(BlogContext)
     const { blog } = useContext(BlogContext)
     let commentArr = blog?.comments?.results
@@ -26,6 +26,7 @@ const CommentField = ({ action, index, replyingTo, setIsReplying }) => {
         }
         let newCommentArr
         if (replyingTo) {
+            
             setIsReplying(false)
   parentCommentIncrementVal = 0
   try {
@@ -57,8 +58,7 @@ const CommentField = ({ action, index, replyingTo, setIsReplying }) => {
       data.data,
       ...commentArr.slice(index + 1)
     ]
-
-    console.log("New commentArr after inserting reply:", newCommentArr)
+    setChildLengthState(prev=>prev+1)
 
     data.data.commented_by = { personal_info: { profile_img, fullname, username } }
     setComment("")

@@ -3,7 +3,7 @@ import { BlogContext } from "../pages/blog.page"
 import { useContext } from "react"
 import CommentField from "./comment-field.component"
 import axios from "axios"
-import { comment } from "postcss"
+
 import NoDataMessage from "./nodata.component"
 import AnimationWrapper from "../common/page-animation"
 import CommentCard from "./comment-card.component"
@@ -62,15 +62,7 @@ const CommentContainer = () => {
                 {
   commentsArr && commentsArr.length ? (
     commentsArr.map((comment, i) => {
-      // 🔎 Debug log for every comment React tries to render
-      console.log("Rendering comment:", {
-        index: i,
-        id: comment._id,
-        text: comment.comment,
-        childrenLevel: comment.childrenLevel,
-        isReply: comment.isReply,
-        children: comment.children,
-      });
+    
 
       return (
         <AnimationWrapper

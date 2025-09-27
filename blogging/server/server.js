@@ -4,7 +4,7 @@ import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from "../server/Schema/User.js";
-import Blog from "../server/Schema/Blog.js"
+// import Blog from "../server/Schema/Blog.js"
 import cors from "cors";
 import admin from "firebase-admin";
 import { getAuth } from "firebase-admin/auth"
@@ -17,6 +17,7 @@ import { nanoid } from "nanoid";
 import Notification from "../server/Schema/Notification.js"
 import Comment from "../server/Schema/Comment.js"
 import CommentInterface from "./CommentClass.js";
+import Blog from "../server/Schema/Blog.js";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 
@@ -617,4 +618,44 @@ server.post("/fetch-replies",async(req,res)=>{
    } catch (error) {
     return res.json(error)
    }
+})
+const deleteComment = async(commentto)=>{
+    const {_id} = commentto
+    const late_comment = await Comment.findOneAndDelete({_id})
+    if (late_comment) {
+        if (commentto.parent) {
+            const parent = await Comment.findOneAndUpdate({_id:commentto.parent},{
+                $pull:{children:{_id}}
+            })
+            const notif = await Notification.findOneAndDelete({reply:_id})
+        }else{
+            const not = await Notification.findOneAndDelete({comment:_id})
+        }
+        const bblog = await Blog.findOneAndUpdate({_id:commentto.blog_id},{
+            $inc :{
+                "activity.total_comments" : -1,"activity.total_parent_comments" : commentto.parent ? 0: -1 
+            },$pull:{
+                "comments" : commentto._id
+            }
+        })
+        if (late_comment.children.length) {
+            for (let index = 0; index < late_comment.children.length; index++) {
+               
+                deleteComment(late_comment.children[index])
+                
+            }
+        }
+
+    }
+}
+server.post("/delete-comment",VerifyJWt,async(req,res)=>{
+    let user_id = req.user
+    let {_id} = req.body
+    let commentto = await Comment.findOne({_id})
+    if (user_id == commentto?.commented_by || user_id == commentto?.blog_author ) {
+        await deleteComment(commentto)
+        return res.status(200).json({"status":"okay"})
+    }else{
+        return res.status(403).json({'error':"you are not allowed to perform this action"})
+    }
 })
