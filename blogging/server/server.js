@@ -602,7 +602,7 @@ server.post("/fetch-replies",async(req,res)=>{
    try {
      let comment = await Comment.findOne({_id}).populate({
          path:'children',
-         option:{
+         options:{
              limit:maxLimit,
              skip:skip,
              sort:{commentedAt : -1}

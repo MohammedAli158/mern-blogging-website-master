@@ -70,19 +70,19 @@ const CommentCard = ({index,leftVal,commentData}) =>{
         setBlog({...blog,comments:{results:commentArr}})
         
     }
-    const loadMoreReplies = async() =>{
-       if (children.length) {
+    const loadMoreReplies = async({skip=0,currentIndex = index}) =>{
+       if (commentArr[currentIndex].children.length) {
         handleHideReply()
         try {
-            let skip = 0
+           
             const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/fetch-replies",{
-                skip,_id
+                skip,_id:commentArr[currentIndex]._id
             })
             if (data) {
-                commentData.isReplyLoaded=true;
+                commentArr[currentIndex].isReplyLoaded=true;
                 for (let i = 0; i < data.data.length; i++) {
-                    data.data[i].childrenLevel = commentData.childrenLevel + 1
-                    commentArr.splice(index + 1 + i + skip , 0 , data.data[i])
+                    data.data[i].childrenLevel = commentArr[currentIndex].childrenLevel + 1
+                    commentArr.splice(currentIndex + 1 + i + skip , 0 , data.data[i])
 
                 }
                 setBlog({...blog,comments:{...comments,results:commentArr}})
@@ -107,6 +107,30 @@ const CommentCard = ({index,leftVal,commentData}) =>{
         console.log(err);
     });
 };
+const LoadMoreRepliesButton = ()=>{
+    let parentIndex = getParentIndex()
+    if (commentArr[index+1]) {
+        
+        
+        if(commentArr[index].childrenLevel>commentArr[index+1].childrenLevel) {
+            if ((index-parentIndex)<commentArr[parentIndex].children.length) {
+               
+                return <button className="text-dark-grey p-2 px-3 hover:bg-grey/30 rounded-md flex items-center gap-2"  onClick={()=>{
+                    loadMoreReplies({skip:index-parentIndex,currentIndex:parentIndex})
+                }} >Load More Replies</button>
+            }
+        }
+    }else{
+        if (parentIndex) {
+            if ((index-parentIndex)<commentArr[parentIndex].children.length) {
+               
+                return <button className="text-dark-grey p-2 px-3 hover:bg-grey/30 rounded-md flex items-center gap-2"  onClick={()=>{
+                    loadMoreReplies({skip:index-parentIndex,currentIndex:parentIndex})
+                }} >Load More Replies</button>
+            }
+        }
+    }
+}
     return (
         <>
        
@@ -146,6 +170,7 @@ const CommentCard = ({index,leftVal,commentData}) =>{
         }
        
        </div>
+       <LoadMoreRepliesButton />
         </>
     )
 }
