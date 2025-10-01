@@ -29,6 +29,8 @@ const BlogPage = ()=>{
     let [like,setLike] = useState(true);
     let[commentsVisible,setCommentsVisible] = useState(false)
     let [totalParentComments,setTotalParentComments] = useState(0)
+    console.log("these are total comments iam setting",total_comments)
+    let [commentsCount,setCommentsCount] = useState(total_comments)
 const fetchBlogs = async()=>{
     try {
         const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
@@ -60,12 +62,15 @@ const fetchSimilarBlogs = async()=>{
 useEffect(()=>{
     
     fetchBlogs()
-    
     setLoading(false)
     
     
     
 },[blog_id])
+useEffect(()=>{
+    setCommentsCount(total_comments)
+    
+},[total_comments])
 useEffect(()=>{
     // fetchBlogs()
     fetchSimilarBlogs()
@@ -78,7 +83,7 @@ useEffect(()=>{
         <Toaster/>
             {
                 loading ? <Loader/>:
-                <BlogContext.Provider value={{blog,setBlog,likes,setLikes,like,setLike,commentsVisible,setCommentsVisible,totalParentComments,setTotalParentComments}} >
+                <BlogContext.Provider value={{blog,setBlog,likes,setLikes,like,setLike,commentsVisible,setCommentsVisible,totalParentComments,setTotalParentComments,commentsCount,setCommentsCount}} >
                      <CommentContainer />
                     <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
                     

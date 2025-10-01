@@ -11,7 +11,7 @@ const CommentCard = ({index,leftVal,commentData}) =>{
     let { commented_by:{personal_info:{profile_img,username:commented_by_username,fullname}},commentedAt,comment,children,_id} = commentData
     let {userAuth : {access_token,username}} = useContext(UserContext)
     let [isReplying,setIsReplying] = useState(false)
-    let {blog,setTotalParentComments,setBlog,blog:{activity,activity:{total_comments,total_parent_comments},author:{personal_info:{username : author_username}},comments,comments:{results:commentArr}}} = useContext(BlogContext)
+    let {blog,setTotalParentComments,setBlog,blog:{activity,activity:{total_comments,total_parent_comments},author:{personal_info:{username : author_username}},comments,comments:{results:commentArr}},setCommentsCount} = useContext(BlogContext)
     // console.log(blog,"this is how blog is ...")
     let [childLengthState,setChildLengthState] = useState(children.length)
     const handleReply = ()=>{
@@ -55,8 +55,14 @@ const CommentCard = ({index,leftVal,commentData}) =>{
         }
         if (commentData.childrenLevel==0 && isDelete) {
             setTotalParentComments(prev=>prev-1)
+           console.log("here, iam reducing the original lenghth by ",commentData.children.length+1)
+            setCommentsCount(prev=>prev-(commentData.children.length+1))
+            
+        }if (!commentData.childrenLevel==0 && isDelete) {
+             setCommentsCount(prev=>prev-1)
         }
-        setBlog({...blog,activity:{...activity,total_parent_comments:total_parent_comments -(commentData.childrenLevel == 0  && isDelete ? 1 :  0) },comments:{results:commentArr}})
+
+        setBlog({...blog,activity:{...activity,total_comments:total_comments-(commentData.childrenLevel==0 && isDelete ? children.length+1 : 1 ),total_parent_comments:total_parent_comments -(commentData.childrenLevel == 0  && isDelete ? 1 :  0) },comments:{results:commentArr}})
     }
     const handleHideReply = ()=>{
         commentData.isReplyLoaded = false

@@ -7,7 +7,7 @@ import { BlogContext } from "../pages/blog.page"
 import { UserContext } from "../App"
 
 const CommentField = ({ action, index, replyingTo, setIsReplying,setChildLengthState }) => {
-    const { blog: { _id, author: { _id: blog_author }, comments, activity, activity: { total_comments, total_parent_comments } }, setBlog, setTotalParentComments } = useContext(BlogContext)
+    const { blog: { _id, author: { _id: blog_author }, comments, activity, activity: { total_comments, total_parent_comments } }, setBlog, setTotalParentComments,setCommentsCount } = useContext(BlogContext)
     const { blog } = useContext(BlogContext)
     let commentArr = blog?.comments?.results
 
@@ -62,6 +62,8 @@ const CommentField = ({ action, index, replyingTo, setIsReplying,setChildLengthS
 
     data.data.commented_by = { personal_info: { profile_img, fullname, username } }
     setComment("")
+    setCommentsCount(prev=>prev+1)
+    console.log("reply count is set")
     setBlog({
       ...blog,
       comments: { ...comments, results: newCommentArr },
@@ -71,7 +73,6 @@ const CommentField = ({ action, index, replyingTo, setIsReplying,setChildLengthS
         total_parent_comments: total_parent_comments + parentCommentIncrementVal
       }
     })
-    console.log("Blog update triggered ✅")
     setTotalParentComments(prev => prev + parentCommentIncrementVal)
 
   } catch (error) {
@@ -96,10 +97,12 @@ const CommentField = ({ action, index, replyingTo, setIsReplying,setChildLengthS
                 if (data) {
                     data.data.commented_by = { personal_info: { profile_img, fullname, username } }
                     setComment("")
+                    setCommentsCount(prev=>prev+1)
                     data.data.childrenLevel = 0
                     setBlog({ ...blog, comments: { ...comments, results: newCommentArr }, activity: { ...activity, total_comments: total_comments + 1, total_parent_comments: total_parent_comments + parentCommentIncrementVal } })
                     console.log("This should be seen after replying ", blog)
                     setTotalParentComments(prev => prev + parentCommentIncrementVal)
+                    
                 }
             } catch (error) {
                 console.log(error)

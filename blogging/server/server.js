@@ -416,7 +416,8 @@ server.post("/get-blog-info", async (req, res) => {
                 return res.json({ "error": `The requested blog is not a draft blog` })
             }
      
-           
+            console.log(bloginfo)
+
             return res.json(bloginfo)
     }
          else {
@@ -631,7 +632,7 @@ const deleteComment = async(commentto)=>{
         }else{
             const not = await Notification.findOneAndDelete({comment:_id})
         }
-        const bblog = await Blog.findOneAndUpdate({_id:commentto.blog_id},{
+        const bblog = await Blog.findOneAndUpdate({_id:late_comment.blog_id},{
             $inc :{
                 "activity.total_comments" : -1,"activity.total_parent_comments" : commentto.parent ? 0: -1 
             },$pull:{
