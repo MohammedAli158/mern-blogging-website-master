@@ -17,7 +17,7 @@ const Navbar = ()=> {
     }
     return (
         <>
-       <nav className="navbar">
+       <nav className="navbar z-50">
 
             <Link to="/"className="w-10 flex-none" >
                 <img src ={logo} className="w-full" />

@@ -149,6 +149,7 @@ server.post('/sign-in', async (req, res) => {
     if (!user.google_auth) {
 
         bcrypt.compare(password, user.personal_info.password, (err, result) => {
+            console.log(result)
             if (err) {
                 return res.json({
                     "error": "error occured while attempting login"
@@ -658,5 +659,34 @@ server.post("/delete-comment",VerifyJWt,async(req,res)=>{
         return res.status(200).json({"status":"okay"})
     }else{
         return res.status(403).json({'error':"you are not allowed to perform this action"})
+    }
+})
+server.post("/change-password",VerifyJWt,async(req,res)=>{
+    const user_id = req.user;
+    const {currentPassword,newPassword} = req.body;
+    const user = await User.findOne({_id:user_id})
+    if (user) {
+        if (user.google_auth) {
+            return res.json({"error":"You cant change password because you are logged in through google"})
+        }
+        console.log(user.personal_info.password,currentPassword,newPassword)
+        try {
+            const result = await bcrypt.compare(currentPassword,user.personal_info.password)
+            console.log(newPassword,"is new pass",currentPassword,"is current password")
+            if (result) {
+                bcrypt.hash(newPassword,11,(err,hashed_password)=>{
+                    User.findOneAndUpdate({_id:user_id},{"personal_info.password":hashed_password}).then(()=>{
+                        return res.json({"status":"okay,password got changed"})
+                    }).catch((err)=>{
+                        return res.json({"error":"some error occured while saving the password"})
+                    })
+                })
+            }else{
+                return res.json({"error":"Current Password is incorrect"})
+            }
+        } catch (error) {
+            // console.log(error,"is errpr")
+            return res.json({"error":error.message})
+        }
     }
 })
