@@ -367,10 +367,7 @@ server.post("/search-users", async (req, res) => {
 
 
 })
-server.post("/get-profile", (req, res, next) => {
-
-    next();
-}, async (req, res) => {
+server.post("/get-profile", VerifyJWt, async (req, res) => {
     const { Username } = req.body
     try {
         const profile = await User.findOne({ "personal_info.username": Username.trim() }).select("-personal_info.password ").populate({
@@ -689,4 +686,33 @@ server.post("/change-password",VerifyJWt,async(req,res)=>{
             return res.json({"error":error.message})
         }
     }
+})
+server.post("/change-profile-img",VerifyJWt,upload.single("profile_img"),async(req,res)=>{
+    let path = req.file.path
+    console.log(path,"this is  patch")
+     const fileBuffer = fs.readFileSync(path)
+        const { data, error } = await supabase.storage
+            .from('BLOG-EDITOR')
+            .upload(req.file.filename, fileBuffer, {
+                contentType: req.file.mimetype,
+                upsert: false
+            });
+        if (error) {
+            return res.json({ "error": error.message })
+        }
+
+
+        const { data: publicUrlData } = supabase.storage
+            .from('BLOG-EDITOR')
+            .getPublicUrl(req.file.filename);
+            console.log(publicUrlData)
+           const user = await User.findOneAndUpdate({_id:req.user},{
+            "personal_info.profile_img":publicUrlData.publicUrl
+           })
+           
+
+
+        return res.json(publicUrlData);
+
+    
 })

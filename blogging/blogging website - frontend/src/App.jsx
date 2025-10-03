@@ -3,7 +3,7 @@ import Navbar from "./components/navbar.component";
 import UserAuthForm from "./pages/userAuthForm.page";
 import { createContext, useEffect,useState } from "react";
 import Editor from "./pages/editor.pages"
-import { getSessionStorage } from "./common/session";
+import { getSessionStorage, setSessionStorage } from "./common/session";
 import HomePage from "./pages/home.page";
 import SearchPage from "./pages/search.page";
 import PageNotFound from "./pages/404.page";
@@ -18,10 +18,7 @@ const App = () => {
     useEffect( ()=>{
         const user= JSON.parse(getSessionStorage("user"));
         if(user){
-           
-            setUserAuth(user);
-            console.log(userAuth,"this si ")
-            
+           setUserAuth(user); 
         }else{
             
             setUserAuth({...userAuth,access_token : null})
@@ -29,6 +26,7 @@ const App = () => {
         
     }
 ,[])
+
 
     return (
         <UserContext.Provider value={ {userAuth,setUserAuth} } >

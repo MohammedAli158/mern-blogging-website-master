@@ -1,12 +1,13 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import logo from "../imgs/logo.png"
 import { Link, Outlet, useNavigate } from "react-router-dom"
 import { UserContext } from "../App"
 import { useContext } from "react"
 import UserNavigationPanel from "./user-navigation.component"
+import { getSessionStorage } from "../common/session"
 const Navbar = ()=> {
     let navigate = useNavigate()
-    let {userAuth, userAuth: {access_token,profile_img}} = useContext(UserContext);
+    let {userAuth, userAuth: {access_token,profile_img},setUserAuth} = useContext(UserContext);
     const [searchVisibility,setSearchVisibility]= useState(false);
     let [showNavigationPanel,setShowNavigationPanel] = useState(false);
     const handleSearchKeyDown =(e)=> {
@@ -15,6 +16,11 @@ const Navbar = ()=> {
             navigate(`/search/${e.target.value}`)
         }
     }
+   useEffect(()=>{
+    let pro = JSON.parse(getSessionStorage("user"))
+    setUserAuth({...userAuth,profile_img:pro.profile_img})
+   },[])
+    
     return (
         <>
        <nav className="navbar z-50">

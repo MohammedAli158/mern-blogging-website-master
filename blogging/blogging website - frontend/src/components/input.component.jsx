@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const InputBoxComponent = ({name,type,placeholder,value,icon})=>{
+const InputBoxComponent = ({name,type,placeholder,value,icon,disable=false})=>{
     const [showPass,setShowPass] = useState(false);
     return (
         <div className="relative w-[100%] mb-4"  >
@@ -10,6 +10,7 @@ const InputBoxComponent = ({name,type,placeholder,value,icon})=>{
         placeholder={placeholder} 
         defaultValue={value} 
         className="input-box"
+        disabled={disable}
         />
         <i className={"fi " + icon + " input-icon"}/>
        {
