@@ -716,3 +716,24 @@ server.post("/change-profile-img",VerifyJWt,upload.single("profile_img"),async(r
 
     
 })
+server.post("/edit-profile",VerifyJWt,async(req,res)=>{
+    const user_id = req.user
+    let {username,bio,facebook,youtube,twitter,instagram,website,github} = req.body.formData
+    try {
+        const user = await User.findOneAndUpdate({_id:user_id},{
+            "personal_info.username":username,"personal_info.bio":bio,"social_links.youtube":youtube,"social_links.instagram":instagram,"social_links.github":github,"social_links.twitter":twitter,"social_links.website":website,"social_links.facebook":facebook
+        },{new:true})
+        if (user) {
+            return res.json(user)
+        }else{
+            return res.json({"error":"There was a problem updating the details"})
+            
+        }
+    } catch (error) {
+            if (error.code =11000 ) {
+                return res.json({"error":"Username already taken"})
+            }
+            return res.json({"error":error.message})
+        
+    }
+})

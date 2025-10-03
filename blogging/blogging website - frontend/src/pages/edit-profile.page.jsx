@@ -11,6 +11,7 @@ const EditProfile = () => {
     let [charactersLeft,setCharactersLeft] = useState(160)
     let [updatedProfileImg,setUpdatedProfileImg] = useState(null)
     let profileImgRef = useRef()
+    let formref=useRef()
     let [profile, setProfile] = useState(
         {
             personal_info: {
@@ -47,6 +48,7 @@ const EditProfile = () => {
                     'Authorization': `Bearer ${access_token}`
                 }
             }).then(({ data }) => {
+                console.log(data,"setting proifile...")
                 setProfile(data?.profile)
                 setLoading(false)
             })
@@ -87,10 +89,53 @@ setSessionStorage("user", JSON.stringify({
         }
 
     }
+    const handleFormSubmit =async (e)=>{
+        e.preventDefault();
+        let form = new FormData(formref.current)
+        let formData={}
+        for (const [key,value] of form.entries()) {
+            formData[key] = value
+        }
+        let {username,youtube,facebook,instagram,github,twitter,website,bio} = formData
+        if (username.length<3) {
+            return toast.error("Please enter a valid Username")
+        }
+        if (bio.length>160) {
+            return toast.error("Bio must be within 160 characters")
+        }
+        try {
+            const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/edit-profile",{
+                formData
+            },{
+                headers:{
+                    Authorization : `Bearer ${access_token}`
+                }
+            })
+            let loading = toast.loading("Updating...")
+            if (data?.data?.error) {
+                toast.dismiss(loading)
+                return toast.error(data.data.error)
+            }
+            if (data) {
+                toast.dismiss(loading)
+                 toast.success("Successfully updated...")
+                let ali = data.data
+                setProfile({...profile,...ali})
+                console.log (ali.personal_info.username,"se change karre")
+                if (userAuth.username != ali.personal_info.username) {
+                    let newu =  {...userAuth,username:ali.personal_info.username}
+                    setSessionStorage ("user",JSON.stringify(newu))
+                    setUserAuth({...userAuth,username:ali.personal_info.username})
+                }
+            }
+        } catch (error) {
+           return  toast.error(error.message)
+        }
+    }
     return (
         <AnimationWrapper>
             {
-                loading ? <Loader/> : <form>
+                loading ? <Loader/> : <form ref={formref} >
                     <Toaster/>
                     <h1 className="max-md:hidden" >Edit Profile</h1>
                     <div className="flex flex-col lg:flex-row items-start py-10 gap-8 lg:gap-10" >
@@ -98,7 +143,8 @@ setSessionStorage("user", JSON.stringify({
 
                     <label className="relative block w-48 h-48 bg-grey rounded-full overflow-hidden" htmlFor="UploadImg" id="profileImgLable">
                         <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-white bg-black/50 opacity-0 hover:opacity-100 cursor-pointer" >
-                            Upload Image
+                            Upload Image 
+                           
                         </div>
                     <img src={profile_img} ref={profileImgRef} />
                     </label>
@@ -116,7 +162,7 @@ setSessionStorage("user", JSON.stringify({
                             </div>
                             <InputBoxComponent name="username" type="text" value={profile_username} placeholder="username" icon="fi-rr-at" />
                             <p className="-mt-3 text-dark-grey" >Username will be used for searching purposes</p>
-                            <textarea className="resize-none input-box h-64 lg:h-40 leading-7 mt-5 pl-5 " maxLength={160} placeholder="add bio" onChange={handleBioCharacterChange} >
+                            <textarea className="resize-none input-box h-64 lg:h-40 leading-7 mt-5 pl-5 " maxLength={160} name="bio" value={bio} placeholder="add bio" onChange={handleBioCharacterChange} >
 
                             </textarea>
                             <p>{charactersLeft} characters left</p>
@@ -129,7 +175,7 @@ setSessionStorage("user", JSON.stringify({
                                 })
                             }
                            </div>
-                           <button className="btn-dark px-6 my-5 w-auto" type="submit" >Submit</button>
+                           <button className="btn-dark px-6 my-5 w-auto" type="submit" onClick={handleFormSubmit} >Submit</button>
                         </div>
                     </div>
                 </form>

@@ -17,8 +17,10 @@ const Navbar = ()=> {
         }
     }
    useEffect(()=>{
-    let pro = JSON.parse(getSessionStorage("user"))
-    setUserAuth({...userAuth,profile_img:pro.profile_img})
+   
+     let pro = JSON.parse(getSessionStorage("user"))
+    setUserAuth({...userAuth,profile_img:pro?.profile_img})
+   
    },[])
     
     return (
