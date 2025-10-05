@@ -3,7 +3,8 @@ import { Navigate, NavLink, Outlet } from "react-router-dom"
 import { UserContext } from "../App"
 
 const SideNav = () => {
-    let {userAuth:{access_token}} = useContext(UserContext)
+    let {userAuth,userAuth:{access_token}} = useContext(UserContext)
+    let new_notification_available = userAuth?.new_notification_available
     let pathname = location.pathname.split('/')[2].replace('-',' ')
     let[pageState,setPageState]=useState(pathname)
     let sideBarRef = useRef()
@@ -33,8 +34,14 @@ const SideNav = () => {
             <i className="fi fi-rr-document" />
             Blogs
             </NavLink>
-            <NavLink to="/dashboard/notification" onClick={(e)=>setPageState(e.target.innerText)} className="sidebar-link" >
-            <i className="fi fi-rr-bell" />
+            <NavLink to="/dashboard/notifications" onClick={(e)=>setPageState(e.target.innerText)} className="sidebar-link "  >
+            <div className="relative" >
+                <i className="fi fi-rr-bell" />
+            {
+                     new_notification_available ? <span className="bg-red h-2 w-2 rounded-full absolute top-0 right-0 z-3" >
+                     </span>: ""
+            }
+            </div>
             Notification
             </NavLink>
             <NavLink to="/editor" onClick={(e)=>setPageState(e.target.innerText)} className="sidebar-link" >

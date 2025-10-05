@@ -737,3 +737,75 @@ server.post("/edit-profile",VerifyJWt,async(req,res)=>{
         
     }
 })
+server.get("/get-notification-state",VerifyJWt, async(req,res)=>{
+    const user_id = req.user;
+   try {
+     const notif = await Notification.exists({notification_for:user_id,seen:false,user:{$ne:user_id}})
+     if (notif) {
+         return res.json ({"new_notification_available":true})
+     }else{
+         return res.json ({"new_notification_available":false})
+     }
+   } catch (error) {
+    console.log (error.message)
+    return res.json ({"error":error.message})
+   }
+})
+server.post("/notifications",VerifyJWt,async(req,res)=>{
+    const user_id = req.user;
+    let {page,filter,deletedCount} = req.body
+    let maxLimit = 10
+    let skip = (page-1)* maxLimit
+    let findQuery = {notification_for:user_id , user:{$ne:user_id}}
+    if (filter!='all') {
+        findQuery.type = filter
+    }
+    if (deletedCount) {
+        skip-= deletedCount
+    }
+   try {
+     const notif = await Notification.find(findQuery).skip(skip).limit(maxLimit).populate("blog","title blog_id banner").populate("user","personal_info.username personal_info.fullname personal_info.profile_img").populate("comment","comment").populate("replied_on_comment","comment").populate("reply","comment").sort({createdAt:-1}).select("createdAt type reply seen")
+    if (notif) {
+        return res.json(notif)
+    }
+   } catch (error) {
+    console.log("error",error.message)
+    return res.json({"error":error.message})
+   }
+})
+server.post("/notification-count",VerifyJWt,async(req,res)=>{
+    const user_id = req.user
+    const {filter} = req.body
+    let findQuery = {
+        notification_for:user_id,
+        user:{
+              $ne:user_id
+        }
+    }
+    if (filter!='all') {
+        findQuery.type = filter
+    }
+   try {
+     const count = await Notification.countDocuments(findQuery)
+     findQuery.seen = false
+     const notSeen = await Notification.countDocuments(findQuery)
+     if (count) {
+         return res.json({"totalDocs":count,"notSeen":notSeen})
+     }
+   } catch (error) {
+    return res.json({"error":error.message})
+   }
+})
+server.post("/delete-notification",VerifyJWt,async(req,res)=>{
+    const {_id} = req.body;
+   try {
+     let deleted_notif = await Notification.findOneAndUpdate({_id},{
+         "seen":true
+     })
+     if (deleted_notif) {
+         return res.json({"status":"okay"})
+     }
+   } catch (error) {
+    return res.json({"error":error.message})
+   }
+})

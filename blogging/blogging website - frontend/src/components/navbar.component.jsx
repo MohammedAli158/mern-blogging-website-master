@@ -5,9 +5,11 @@ import { UserContext } from "../App"
 import { useContext } from "react"
 import UserNavigationPanel from "./user-navigation.component"
 import { getSessionStorage } from "../common/session"
+import axios from "axios"
 const Navbar = ()=> {
     let navigate = useNavigate()
     let {userAuth, userAuth: {access_token,profile_img},setUserAuth} = useContext(UserContext);
+    let new_notification_available = userAuth?.new_notification_available
     const [searchVisibility,setSearchVisibility]= useState(false);
     let [showNavigationPanel,setShowNavigationPanel] = useState(false);
     const handleSearchKeyDown =(e)=> {
@@ -22,6 +24,26 @@ const Navbar = ()=> {
     setUserAuth({...userAuth,profile_img:pro?.profile_img})
    
    },[])
+   const fN = async () =>{
+    let data = await axios.get(import.meta.env.VITE_SERVER_PATH+"/get-notification-state",{
+            headers:{
+                Authorization:`Bearer ${access_token}`
+            }
+        })
+        if (data && data.data?.error ) {
+           console.log (data.data.error,"while fetching notification state")
+           
+        }
+        else {
+            let ali = data.data
+            setUserAuth({...userAuth,...ali})
+        }
+   }
+   useEffect( ()=>{
+    if (access_token) {
+        fN ()
+    }
+   },[access_token])
     
     return (
         <>
@@ -30,6 +52,7 @@ const Navbar = ()=> {
             <Link to="/"className="w-10 flex-none" >
                 <img src ={logo} className="w-full" />
             </Link>
+           
             <div className= {"absolute bg-white w-full left- top-full mt-0.5 border-b border-grey py-6 px-[5vw] md:relative md:inset-0 md:p-0 md:border-0 md:block-0 md:w-auto md:show " + (searchVisibility ? "show" : "hide")} >
                 
 
@@ -41,6 +64,7 @@ const Navbar = ()=> {
                  />
 
                 <i className="fi fi-rr-search absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-dark-grey"></i>
+                
                 
             </div>
             <div className="flex justify-center align-center ml-auto" >
@@ -56,9 +80,13 @@ const Navbar = ()=> {
                     access_token ?
                     <>
                     
-                    <Link to="/dashboard/notification">
+                    <Link to="/dashboard/notifications">
                         <button className="w-12 h-12 rounded-full relative bg-grey hover:bg-black/30" >
-                            <i className="fi fi-rr-bell text-2xl block mt-1"/>
+                            <i className="fi fi-rr-bell text-2xl block mt-1"/>{
+                                new_notification_available ? <span className="bg-red h-3 w-3 rounded-full absolute top-2 right-2 z-3" >
+
+                                </span>: ""
+                            }
                         </button>
                     </Link>
                     <div className="relative" >

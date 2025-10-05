@@ -43,14 +43,19 @@ const blogS = {
     const [blogs,setBlogs] = useState([blogS])
     const [pageCount,setPageCount] = useState(5)
 
-
+    
     let {Username} = useParams()
     let { personal_info:{fullname,username,profile_img,bio},account_info:{total_posts,total_reads},social_links,joinedAt,_id } = profile
     const fetchProfile= async()=>{
         
         
         try {
-            const data = await axios.post(import.meta.env.VITE_SERVER_PATH +"/get-profile", { Username } )
+          console.log("this is access token",userAuth?.access_token)
+            const data = await axios.post(import.meta.env.VITE_SERVER_PATH +"/get-profile", { Username },{
+              headers:{
+                Authorization:`Bearer ${userAuth?.access_token}`
+              }
+            } )
             setProfile(data.data.profile)
             setLoading(false)
         } catch (error) {
@@ -90,11 +95,12 @@ const blogS = {
     useEffect(()=>{
         fetchProfile()
         
-    },[Username])
+    },[userAuth])
     useEffect(()=>{
         fetchBlogs()
        
     },[page,_id])
+  
     return(
         <AnimationWrapper>
   <div className="max-md:mt-12 w-full md:flex md:items-start md:gap-8">
