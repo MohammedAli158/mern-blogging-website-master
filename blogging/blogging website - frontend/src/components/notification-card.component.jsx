@@ -27,8 +27,6 @@ const handleSeen = async(e)=>{
     let a = cardState.filter(item=>item._id!=notid)
     setCardState([...a])
     let b = cardState.filter(item=>item._id==notid)
-    console.log(b,"sending from above to below")
-    
     setAlwaysCardState([...alwaysCardState,...b])
     
 

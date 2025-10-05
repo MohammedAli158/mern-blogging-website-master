@@ -30,7 +30,6 @@ const Editor = () =>{
             blog_id, draft:true , mode:'edit'
         }).then(({data})=>{
             if (Object.entries(data).length === 0){
-            console.log("Not exists")
             return toast.error("The blog doesn't exist")
         }
             setBlog(data)

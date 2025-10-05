@@ -226,8 +226,10 @@ server.post('/editor', upload.fields([
         if (error) {
             return res.json({ "error": error.message })
         }
-
-
+        fs.unlink(req.files.banner?.[0].path ||req.files.image?.[0].path  , (err) => {
+      if (err) console.error("Temp file deletion failed:", err);
+    });
+        
         const { data: publicUrlData } = supabase.storage
             .from('BLOG-EDITOR')
             .getPublicUrl(req.files.banner?.[0].filename || req.files.image?.[0].filename);
@@ -774,7 +776,11 @@ server.post("/notifications",VerifyJWt,async(req,res)=>{
    try {
      const notif = await Notification.find(findQuery).skip(skip).limit(maxLimit).populate("blog","title blog_id banner").populate("user","personal_info.username personal_info.fullname personal_info.profile_img").populate("comment","comment").populate("replied_on_comment","comment").populate("reply","comment").sort({createdAt:-1}).select("createdAt type reply seen")
     if (notif) {
-        return res.json(notif)
+        let show = true
+        if (notif.length<10) {
+            show = false
+        }
+        return res.json({notif,show})
     }
    } catch (error) {
     console.log("error",error.message)

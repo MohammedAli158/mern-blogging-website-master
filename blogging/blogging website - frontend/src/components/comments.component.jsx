@@ -41,7 +41,6 @@ const CommentContainer = () => {
 
         setBlog({ ...blog, comments: newCommentsArr })
     }
-
     return (
         <div
             className={`fixed max-sm:w-full w-[40%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 

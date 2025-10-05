@@ -25,7 +25,7 @@ const ChangePassword = () =>{
         }
         let LoadingToast = toast.loading("Updating....")
         e.target.setAttribute("disabled",true)
-        console.log(formData,"is formdata")
+       
         try {
             let data = await axios.post(import.meta.env.VITE_SERVER_PATH + "/change-password",{
                 currentPassword:formData.currentPassword ,newPassword:formData.newPassword
@@ -41,7 +41,7 @@ const ChangePassword = () =>{
                 return 
             }
             if (data) {
-                console.log(data)
+               
                 e.target.removeAttribute("disabled")
                 toast.dismiss(LoadingToast)
                 toast.success("Successfully Updated")

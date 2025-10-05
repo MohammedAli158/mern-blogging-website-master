@@ -9,13 +9,11 @@ const BlogManagementPage = ()=>{
     let [page,setPage] = useState(1)
     let pageCurrent = 1
     let u = JSON.parse(getSessionStorage("user"))
-    console.log(u.username)
     const fetchBlogs = async() =>{
         let data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/search-blogs",{
             un:u.username
         })
         if (data) {
-            console.log(data.data)
             let ali = data?.data?.blogs
             setBlogArray([...blogArray,...ali])
             setPage(data?.data?.pageCount)
@@ -28,7 +26,6 @@ const BlogManagementPage = ()=>{
         axios.post(import.meta.env.VITE_SERVER_PATH+'/search-blogs',{
             pageCurrent,un:u.username
         }).then(({data})=>{
-            console.log("data",data)
             let ali = data.blogs
             setBlogArray([...ali])
         }).catch(err=>{

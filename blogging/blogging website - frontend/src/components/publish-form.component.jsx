@@ -14,8 +14,13 @@ import { getSessionStorage } from "../common/session";
     const user = JSON.parse(getSessionStorage("user"))
     const access_token = user.access_token
     const navigate = useNavigate()
-    const {editorState,setEditorState,blog:{content,title,tags,banner,des},setBlog,blog
+    const {editorState,setEditorState,setBlog,blog
     } = useContext(EditorContext);
+    let title = blog?.title
+    let content = blog?.content
+    let tags = blog?.tags
+    let banner = blog?.banner
+    let des = blog?.des
     const handleTitleOnChange =(e)=>{
         let input = e.target
         setBlog({...blog,title:input.value})
@@ -41,7 +46,6 @@ import { getSessionStorage } from "../common/session";
              
              if (tag.length && tags.length<10 && !(tags.includes(tag))  ) {
                     setBlog({...blog, tags:[...tags,tag]})
-                    console.log(tags)
                 }
                 if (tags.includes(tag)) {
                     toast.error("You cant add same tag again")
@@ -117,7 +121,7 @@ import { getSessionStorage } from "../common/session";
                <input type="text"  placeholder="Blog-Title" className="input-box pl-5 bg-grey " onChange={handleTitleOnChange}  defaultValue={title}/>
                <p className="text-dark-grey mb-2 mt-9" >Add Short Description About your Blog</p>
                <textarea maxLength='200' className="resize-none input-box leading-8 h-40 pl-4" defaultValue={des} onChange={handleDescriptionOnChange} onKeyDown={handleKeyDown} ></textarea>
-               <p className="text-dark-grey text-sm text-right mt-2" > {200-des.length} characters left</p>
+               <p className="text-dark-grey text-sm text-right mt-2" > {200-des?.length} characters left</p>
                <p className="text-dark-grey mb-2 mt-9" >Topics- Helps in searhing and ranking your posts</p>
                <div className="relative input-box pl-2 py-2 pb-4" ></div>
                <div className="relative input-box pl-2 py-2 pb-4" > 

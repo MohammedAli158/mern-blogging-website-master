@@ -20,7 +20,6 @@ const HomePage = () => {
 
         if (category == pageStatus) {
             setPageStatus("home")
-            console.log(category, pageStatus)
 
             e.target.classList.remove("bg-black")
             e.target.classList.remove("text-white")
@@ -68,7 +67,7 @@ const HomePage = () => {
     const handlePageClick = (e)=>{
         let pagec  = e.target.value
         if (pagec == ActivePage) {
-            console.log("aha")
+           
             return 
         }
         setActivePage(pagec)

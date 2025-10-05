@@ -12,7 +12,6 @@ const CommentCard = ({index,leftVal,commentData}) =>{
     let {userAuth : {access_token,username}} = useContext(UserContext)
     let [isReplying,setIsReplying] = useState(false)
     let {blog,setTotalParentComments,setBlog,blog:{activity,activity:{total_comments,total_parent_comments},author:{personal_info:{username : author_username}},comments,comments:{results:commentArr}},setCommentsCount} = useContext(BlogContext)
-    // console.log(blog,"this is how blog is ...")
     let [childLengthState,setChildLengthState] = useState(children.length)
     const handleReply = ()=>{
        
@@ -55,7 +54,6 @@ const CommentCard = ({index,leftVal,commentData}) =>{
         }
         if (commentData.childrenLevel==0 && isDelete) {
             setTotalParentComments(prev=>prev-1)
-           console.log("here, iam reducing the original lenghth by ",commentData.children.length+1)
             setCommentsCount(prev=>prev-(commentData.children.length+1))
             
         }if (!commentData.childrenLevel==0 && isDelete) {

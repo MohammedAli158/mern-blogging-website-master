@@ -6,6 +6,7 @@ import { useContext } from "react"
 import UserNavigationPanel from "./user-navigation.component"
 import { getSessionStorage } from "../common/session"
 import axios from "axios"
+import toast from "react-hot-toast"
 const Navbar = ()=> {
     let navigate = useNavigate()
     let {userAuth, userAuth: {access_token,profile_img},setUserAuth} = useContext(UserContext);
@@ -32,6 +33,7 @@ const Navbar = ()=> {
         })
         if (data && data.data?.error ) {
            console.log (data.data.error,"while fetching notification state")
+           return toast.error (data.data?.error)
            
         }
         else {

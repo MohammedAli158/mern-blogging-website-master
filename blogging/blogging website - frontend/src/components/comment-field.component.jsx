@@ -35,9 +35,6 @@ const CommentField = ({ action, index, replyingTo, setIsReplying,setChildLengthS
       { parent_comment_id: replyingTo, blog_id: _id, blog_author, comment },
       { headers: { Authorization: `Bearer ${access_token}` } }
     )
-
-    console.log("Axios reply response:", data)
-
     if (!data || !data.data) {
       console.error("No data returned from /add-reply")
       return
@@ -63,7 +60,6 @@ const CommentField = ({ action, index, replyingTo, setIsReplying,setChildLengthS
     data.data.commented_by = { personal_info: { profile_img, fullname, username } }
     setComment("")
     setCommentsCount(prev=>prev+1)
-    console.log("reply count is set")
     setBlog({
       ...blog,
       comments: { ...comments, results: newCommentArr },
@@ -100,7 +96,6 @@ const CommentField = ({ action, index, replyingTo, setIsReplying,setChildLengthS
                     setCommentsCount(prev=>prev+1)
                     data.data.childrenLevel = 0
                     setBlog({ ...blog, comments: { ...comments, results: newCommentArr }, activity: { ...activity, total_comments: total_comments + 1, total_parent_comments: total_parent_comments + parentCommentIncrementVal } })
-                    console.log("This should be seen after replying ", blog)
                     setTotalParentComments(prev => prev + parentCommentIncrementVal)
                     
                 }

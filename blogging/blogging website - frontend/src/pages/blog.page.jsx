@@ -29,7 +29,6 @@ const BlogPage = ()=>{
     let [like,setLike] = useState(true);
     let[commentsVisible,setCommentsVisible] = useState(false)
     let [totalParentComments,setTotalParentComments] = useState(0)
-    console.log("these are total comments iam setting",total_comments)
     let [commentsCount,setCommentsCount] = useState(total_comments)
 const fetchBlogs = async()=>{
     try {

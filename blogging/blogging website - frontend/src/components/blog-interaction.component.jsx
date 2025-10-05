@@ -45,7 +45,6 @@ const handleLikeClick  = async (e) =>{
 
     setLike (prev=>!prev)
     if (like) { //not already liked , unclick->click
-        console.log("sending like req")
         try {
             const res = await axios.post(import.meta.env.VITE_SERVER_PATH+"/like-info",{
                 _id : _id, dec : "false"
@@ -55,7 +54,7 @@ const handleLikeClick  = async (e) =>{
                 }
             })
             if (res) {
-                console.log (res.data)
+              
                 setLike (res.data?.like)  
                 setLikes (res.data?.likes) 
             }
@@ -73,7 +72,7 @@ const handleLikeClick  = async (e) =>{
                 }
             })
             if (res) {
-                console.log ("remove likes",res.data) 
+             
                 setLike(res.data.like) 
                 setLikes(res.data.likes) 
             }
@@ -87,9 +86,6 @@ useEffect(() => {
     fetchLikeInfo() 
    
 }, [_id]);
-
-useEffect(()=>console.log("commentsCount child:", commentsCount),[commentsCount])
-
     return (
         <>
         <Toaster/>

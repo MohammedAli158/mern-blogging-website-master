@@ -7,12 +7,8 @@ const BlogPostCard = ({content,author,hidden,buttons=false,blogs,setBlogs}) =>{
     
     let {publishedAt, title, tags,des,banner,activity:{total_likes,total_comments},blog_id:id} = content
     let {fullname,username,profile_img} = author
-    console.log(fullname,username,profile_img)
    const handleDeletionBlog = async()=>{
     setBlogs(blogs.filter(item=>item.publishedAt != publishedAt))
-    console.log(id,"is id")
-    console.log(import.meta.env.VITE_SERVER_PATH)
-
     const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/delete-blog",{
         blog_id:id
     })

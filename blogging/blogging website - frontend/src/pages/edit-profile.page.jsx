@@ -48,7 +48,7 @@ const EditProfile = () => {
                     'Authorization': `Bearer ${access_token}`
                 }
             }).then(({ data }) => {
-                console.log(data,"setting proifile...")
+               
                 setProfile(data?.profile)
                 setLoading(false)
             })
@@ -121,7 +121,7 @@ setSessionStorage("user", JSON.stringify({
                  toast.success("Successfully updated...")
                 let ali = data.data
                 setProfile({...profile,...ali})
-                console.log (ali.personal_info.username,"se change karre")
+                
                 if (userAuth.username != ali.personal_info.username) {
                     let newu =  {...userAuth,username:ali.personal_info.username}
                     setSessionStorage ("user",JSON.stringify(newu))

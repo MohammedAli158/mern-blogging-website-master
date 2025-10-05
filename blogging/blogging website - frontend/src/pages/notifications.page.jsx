@@ -3,6 +3,7 @@ import { UserContext } from "../App"
 import axios from "axios"
 import NotificationCard from "../components/notification-card.component"
 const Notifications = ()=>{
+    let [showMore,setShowMore] = useState(false)
     let {userAuth,setUserAuth} = useContext(UserContext)
     let access_token = userAuth?.access_token
     const [filter,setFilter] = useState('all')
@@ -19,11 +20,12 @@ const Notifications = ()=>{
             }
         })
         if (data) {
-            let ali = data.data
+            let ali = data.data?.notif
             let seen = ali.filter(item=>item.seen==true)
             let notSeen = ali.filter(item=>item.seen==false)
             setCardState([...cardState,...notSeen])
             setAlwaysCardState([...alwaysCardState,...seen])
+            setShowMore(data.data?.show)
         }
     }
     const loadMore = (e)=>{
@@ -66,7 +68,7 @@ if (cardState.length==0) {
                 <NotificationCard cardState={cardState}  alwaysCardState={alwaysCardState} setAlwaysCardState={setAlwaysCardState} setCardState={setCardState} title={notif.blog.title} blog_id={notif?.blog?.blog_id} key={i} notid={notif?._id} type={notif?.type} banner={notif?.blog?.banner} createdAt={notif?.createdAt} by={notif?.user} comment={notif?.comment?.comment}  />  : <h1>You are all caught up</h1> 
             })
             }
-            <button className="btn-light h-15 text-sm bg-white text-black" onClick={loadMore}  >Load More</button>
+            <button className={"btn-light h-15 text-sm bg-white text-black"+ (showMore  ?"  " : " hidden ")} onClick={loadMore}  >Load More</button>
             <h1 className="my-15" >Seen Notifications</h1>
             {
                 alwaysCardState.map((notif,i)=>{

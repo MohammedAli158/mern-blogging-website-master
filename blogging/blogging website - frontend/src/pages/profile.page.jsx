@@ -50,7 +50,6 @@ const blogS = {
         
         
         try {
-          console.log("this is access token",userAuth?.access_token)
             const data = await axios.post(import.meta.env.VITE_SERVER_PATH +"/get-profile", { Username },{
               headers:{
                 Authorization:`Bearer ${userAuth?.access_token}`
@@ -66,7 +65,7 @@ const blogS = {
     const handlePageClick = async(e)=>{
         let pagec = e.target.value;
         if (pagec == page) {
-            console.log("since pagec == page returning")
+        
             return 
         }
         setPage(e.target.value)
@@ -74,7 +73,6 @@ const blogS = {
     }
     const fetchBlogs = async()=>{
         try {
-          console.log(_id,"sending")
           if (_id) {
             
             const blogs = await axios.post(import.meta.env.VITE_SERVER_PATH+"/search-blogs", {
