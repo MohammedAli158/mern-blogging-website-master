@@ -18,6 +18,7 @@ import Notification from "../server/Schema/Notification.js"
 import Comment from "../server/Schema/Comment.js"
 import CommentInterface from "./CommentClass.js";
 import Blog from "../server/Schema/Blog.js";
+const escapeRegex = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 
@@ -149,7 +150,7 @@ server.post('/sign-in', async (req, res) => {
     if (!user.google_auth) {
 
         bcrypt.compare(password, user.personal_info.password, (err, result) => {
-            console.log(result)
+           
             if (err) {
                 return res.json({
                     "error": "error occured while attempting login"
@@ -304,11 +305,19 @@ server.get("/trending-blogs", async (req, res) => {
         return res.status(500).json({ error })
     }
 })
-const escapeRegex = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 server.post("/search-blogs", async (req, res) => {
-    const { tag, _id, query, eliminate_blog } = req.body || {};
-    const pageCurrent = Math.max(1, parseInt(req.body?.pageCurrent, 10) || 1);
+    const { tag,  query, eliminate_blog } = req.body || {};
+    const un = req.body?.un
+    let _id = req.body?._id 
+    if (!_id) {
+        let hii = await User.findOne({"personal_info.username":un})
+       
+        _id = hii?._id
+       
+    }
+
+    const pageCurrent = req?.body?.pageCurrent || 1
     const maxLimit = 5;
 
     try {
@@ -339,7 +348,6 @@ server.post("/search-blogs", async (req, res) => {
 
         const count = await Blog.countDocuments(filters);
         const pageCount = Math.ceil(count / maxLimit);
-
         const blogs = await Blog.find(filters)
             .populate("author", "personal_info.fullname personal_info.profile_img personal_info.username -_id")
             .sort({ publishedAt: -1 })
@@ -414,7 +422,7 @@ server.post("/get-blog-info", async (req, res) => {
                 return res.json({ "error": `The requested blog is not a draft blog` })
             }
      
-            console.log(bloginfo)
+           
 
             return res.json(bloginfo)
     }
@@ -682,7 +690,7 @@ server.post("/change-password",VerifyJWt,async(req,res)=>{
                 return res.json({"error":"Current Password is incorrect"})
             }
         } catch (error) {
-            // console.log(error,"is errpr")
+           
             return res.json({"error":error.message})
         }
     }
@@ -705,7 +713,7 @@ server.post("/change-profile-img",VerifyJWt,upload.single("profile_img"),async(r
         const { data: publicUrlData } = supabase.storage
             .from('BLOG-EDITOR')
             .getPublicUrl(req.file.filename);
-            console.log(publicUrlData)
+          
            const user = await User.findOneAndUpdate({_id:req.user},{
             "personal_info.profile_img":publicUrlData.publicUrl
            })
@@ -808,4 +816,15 @@ server.post("/delete-notification",VerifyJWt,async(req,res)=>{
    } catch (error) {
     return res.json({"error":error.message})
    }
+})
+server.post("/delete-blog",async(req,res)=>{
+    const {blog_id} = req.body;
+    console.log(blog_id,"this is blo it")
+    const deleted = await Blog.findOneAndDelete({blog_id:blog_id})
+   
+       console.log(deleted._id,"deleted id")
+        await Comment.deleteMany({blog_id:deleted._id})
+        await Notification.deleteMany({blog:deleted._id})
+        return res.json({"status":"okay"})
+    
 })

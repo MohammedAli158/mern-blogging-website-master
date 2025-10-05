@@ -74,19 +74,23 @@ const blogS = {
     }
     const fetchBlogs = async()=>{
         try {
+          console.log(_id,"sending")
+          if (_id) {
+            
             const blogs = await axios.post(import.meta.env.VITE_SERVER_PATH+"/search-blogs", {
-                pageCurrent : page,
-                 _id
+              pageCurrent : page,
+              _id
             })
             
-    
+            
             if (blogs) {
-               
-                setBlogs(blogs.data.blogs)
-                setPageCount(blogs.data.pageCount)
-                
+              
+              setBlogs(blogs.data.blogs)
+              setPageCount(blogs.data.pageCount)
+              
             }
-        } catch (error) {
+          }
+          } catch (error) {
             console.log(error)
         }
 
@@ -119,7 +123,7 @@ const blogS = {
   <>
     {blogs.map((blog, i) => (
       <AnimationWrapper key={i} transition={{ duration: 1, delay: i * 0.1 }}>
-        <BlogPostCard hidden={true} content={blog} author={blog.author.personal_info} />
+        <BlogPostCard hidden={true} buttons={false} content={blog} setBlogs={setBlogs} blogs={blogs} author={blog.author.personal_info} />
       </AnimationWrapper>
     ))}
     <div className="w-120px flex gap-2">

@@ -24,7 +24,6 @@ const Notifications = ()=>{
             let notSeen = ali.filter(item=>item.seen==false)
             setCardState([...cardState,...notSeen])
             setAlwaysCardState([...alwaysCardState,...seen])
-            console.log(ali)
         }
     }
     const loadMore = (e)=>{
@@ -38,7 +37,7 @@ const Notifications = ()=>{
 if (cardState.length==0) {
     setUserAuth({...userAuth,new_notification_available:false})
 }
-console.log("this is card state",cardState,"this is always",alwaysCardState)
+
    },[cardState])
    
     return (
