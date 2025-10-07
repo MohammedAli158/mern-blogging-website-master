@@ -3,7 +3,7 @@ import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD2FjOCmKSspTehqA51amvNv5pDh1WdHGg",
-  authDomain: "mern-blogging-website-master-m3wa.onrender.com",
+  authDomain: "blogspace-sandy.vercel.app/",
   projectId: "react-js-blogging-websit-d2b6e",
   storageBucket: "react-js-blogging-websit-d2b6e.firebasestorage.app",
   messagingSenderId: "558507754968",
