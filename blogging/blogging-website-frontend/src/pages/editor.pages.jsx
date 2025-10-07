@@ -16,13 +16,16 @@ const blogStructure ={
 export const EditorContext = createContext({})
 
 const Editor = () =>{
+
     const {blog_id} = useParams()
     let [loading,setLoading] = useState(true)
     let [blog,setBlog] = useState(blogStructure)
     let [editorState,setEditorState] = useState("editor")
     let [textEditor,setTextEditor] = useState({ isReady : false })
-    let {userAuth:{access_token},setUserAuth} = useContext(UserContext)
+    let userAuth = useContext(UserContext)
+    console.log(userAuth?.access_token==undefined,"this is log")
     useEffect(()=>{
+
         if(!blog_id){
             return setLoading(false)
         }
@@ -44,7 +47,7 @@ const Editor = () =>{
     return (
         <EditorContext.Provider value={{blog,setBlog,editorState,setEditorState,textEditor,setTextEditor}} >  
             {
-                access_token===undefined ? <Navigate path="/sign-in"/> : 
+                userAuth?.access_token==undefined ? <Navigate to="/sign-up"/> : 
                 loading ? <Loader/> : 
                 ( editorState=="editor" ? 
                 <BlogEditor/> : <PublishForm/>)

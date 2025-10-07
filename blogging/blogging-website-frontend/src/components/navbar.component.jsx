@@ -9,7 +9,15 @@ import axios from "axios"
 import toast from "react-hot-toast"
 const Navbar = ()=> {
     let navigate = useNavigate()
-    let {userAuth, userAuth: {access_token,profile_img},setUserAuth} = useContext(UserContext);
+   let {
+  userAuth = {},           // default empty object if userAuth is undefined
+  userAuth: { 
+    access_token = null,   // default value if undefined
+    profile_img = null 
+  } = {},
+  setUserAuth = () => {}   // default to no-op function
+} = useContext(UserContext) || {};
+
     let new_notification_available = userAuth?.new_notification_available
     const [searchVisibility,setSearchVisibility]= useState(false);
     let [showNavigationPanel,setShowNavigationPanel] = useState(false);
