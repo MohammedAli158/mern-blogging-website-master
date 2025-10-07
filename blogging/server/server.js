@@ -175,39 +175,50 @@ const Admin = admin.initializeApp({
 );
 
 server.post("/google-auth", async (req, res) => {
-    const { access_token } = req.body;
-    try {
-        const decodedUser = await getAuth().verifyIdToken(access_token);
-        let { email, name, picture } = decodedUser;
-        picture = picture.replace("s-96c", "s-384");
+  const { access_token } = req.body;
 
-        let user = await User.findOne({ "personal_info.email": email }).select("personal_info.username personal_info.fullname personal_info.email personal_info.profile_img google_auth");
+  try {
+    // Verify the Firebase ID token (not the Google OAuth token)
+    const decodedUser = await getAuth().verifyIdToken(access_token);
+    let { email, name, picture } = decodedUser;
+    picture = picture.replace("s96-c", "s384-c");
 
-        if (user) {
-            if (!user.google_auth) {
-                return res.status(403).json({ error: "Email already registered, use password login." });
-            }
-        } else {
-            const username = await generateUsername(email);
-            user = new User({
-                personal_info: { fullname: name, username, email, profile_img },
-                google_auth: true
-            });
-            await user.save();
-        }
+    let user = await User.findOne({
+      "personal_info.email": email
+    }).select(
+      "personal_info.username personal_info.fullname personal_info.email personal_info.profile_img google_auth"
+    );
 
-
-        const customToken = jwt.sign(
-            { id: user._id },
-            process.env.JWT_ACCESS_TOKEN_SECRET,
-            { expiresIn: process.env.JWT_EXPIRY }
-        );
-        return res.json(SendFrontEnd(user))
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ error: "Authentication failed, try another Google account." });
+    if (user) {
+      if (!user.google_auth) {
+        return res
+          .status(403)
+          .json({ error: "Email already registered, use password login." });
+      }
+    } else {
+      const username = await generateUsername(email);
+      user = new User({
+        personal_info: { fullname: name, username, email, profile_img: picture },
+        google_auth: true
+      });
+      await user.save();
     }
+
+    const customToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_ACCESS_TOKEN_SECRET,
+      { expiresIn: process.env.JWT_EXPIRY }
+    );
+
+    return res.json(SendFrontEnd(user));
+  } catch (err) {
+    console.error("Google auth error:", err);
+    return res
+      .status(500)
+      .json({ error: "Authentication failed, try another Google account." });
+  }
 });
+
 server.post('/editor', upload.fields([
     { name: "banner", maxCount: 1 },
     { name: "image", maxCount: 1 },

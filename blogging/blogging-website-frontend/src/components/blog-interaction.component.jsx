@@ -25,14 +25,12 @@ const fetchLikeInfo = async () =>{
                 Authorization : `Bearer ${user?.access_token}`
             }
         }) 
-        
         if (data) {
-     setLike(data.data.like)
+            setLike(data.data.like)
             setLikes(data.data.likes)
         }else{
             console.log("data is nul")
         }
-
     } catch (error) {
         console.log(error)
     }
@@ -62,7 +60,7 @@ const handleLikeClick  = async (e) =>{
             
         }
     }else{
-       
+        console.log("click se unclick")
         try {
             const res = await axios.post(import.meta.env.VITE_SERVER_PATH+"/like-info",{
                 _id : _id,dec:true

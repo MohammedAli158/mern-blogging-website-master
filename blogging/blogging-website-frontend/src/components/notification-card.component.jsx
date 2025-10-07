@@ -11,6 +11,7 @@ const NotificationCard = ({title,mark=true,alwaysCardState,setAlwaysCardState, s
     let {userAuth:{access_token}} = useContext(UserContext)
   const [hide,setHide] = useState(false)
 const handleSeen = async(e)=>{
+   e.stopPropagation()
     e.target.setAttribute("disabled",true)
     const n = await axios.post(import.meta.env.VITE_SERVER_PATH+"/delete-notification",{
         _id:notid

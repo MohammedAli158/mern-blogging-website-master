@@ -22,6 +22,9 @@ const UserAuthForm = ({type})=> {
         const response = await axios.post(import.meta.env.VITE_SERVER_PATH + path, Formdata);
         
         const userData = response.data;
+        if (response?.data?.error) {
+            return toast.error(response.data.error)
+        }
 
         setSessionStorage("user", JSON.stringify(userData));
        
@@ -73,12 +76,12 @@ const UserAuthForm = ({type})=> {
             try {
                 const aut = await authorizeGoogle();
                 if (aut) {
-                 
+                 const idToken = {aut}
                 let path = "/google-auth";
                 
                 
                 let data = {
-                    "access_token" : aut.accessToken
+                    "access_token" : aut.idToken
                 }
                 const userData = await SendFormtoBackend(path,data);
                

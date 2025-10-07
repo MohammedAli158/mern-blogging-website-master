@@ -25,8 +25,8 @@ const monthsShort = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
-export const getFullDay=(timestamp)=>{
-  let date = new Date(timestamp)
+export const getFullDay = (timestamp) => {
+  const date = new Date(timestamp);
+  return `${date.getDate()} ${monthsShort[date.getMonth()]} ${date.getFullYear()}`;
+};
 
-  return `${date.getDay()} ${monthsShort[date.getMonth()+1]} ${date.getFullYear()} `
-}

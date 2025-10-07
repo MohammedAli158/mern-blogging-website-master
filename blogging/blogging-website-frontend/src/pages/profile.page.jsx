@@ -146,7 +146,7 @@ const blogS = {
 </div>
 
         <>
-          <div className="flex flex-col gap-5 min-w-[250px]">
+          <div className="flex flex-col gap-5 min-w-[250px] ml-20 md:hidden">
             <img
               src={profile_img}
               className="h-[40%] w-[40%] rounded-full bg-grey "

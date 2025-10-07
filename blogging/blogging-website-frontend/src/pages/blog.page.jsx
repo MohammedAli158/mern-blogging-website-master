@@ -3,7 +3,7 @@ import { createContext, useEffect, useState } from "react"
 import { useParams,Link } from "react-router-dom"
 import AnimationWrapper from "../common/page-animation"
 import Loader from "../components/loader.component"
-import { getFullDay } from "../common/date"
+import { getDate, getFullDay } from "../common/date"
 import BlogInteraction from "../components/blog-interaction.component"
 import BlogPostCard from "../components/blog-post.component"
 import BlogContent from "../components/blog-content.component"
@@ -31,6 +31,7 @@ const BlogPage = ()=>{
     let [totalParentComments,setTotalParentComments] = useState(0)
     let [commentsCount,setCommentsCount] = useState(total_comments)
 const fetchBlogs = async()=>{
+    toast("In order to see proper like count, log-in/sign-up Please co-operate with our policies")
     try {
         const data = await axios.post(import.meta.env.VITE_SERVER_PATH+"/get-blog-info",{
             blog_id:blog_id
