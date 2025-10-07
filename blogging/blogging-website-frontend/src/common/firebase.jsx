@@ -3,7 +3,7 @@ import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD2FjOCmKSspTehqA51amvNv5pDh1WdHGg",
-  authDomain: "bucolic-madeleine-65d6d2.netlify.app",
+  authDomain: "mern-blogging-website-master-m3wa.onrender.com",
   projectId: "react-js-blogging-websit-d2b6e",
   storageBucket: "react-js-blogging-websit-d2b6e.firebasestorage.app",
   messagingSenderId: "558507754968",
