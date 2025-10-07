@@ -8,7 +8,7 @@ import axios from "axios";
 import { getSessionStorage, setSessionStorage } from "../common/session";
 import { UserContext } from "../App";
 import { useContext,useEffect} from "react";
-import { authorizeGoogle } from "../common/firebase";
+import { authorizeGoogle } from "../common/firebase.jsx";
 
 
 
