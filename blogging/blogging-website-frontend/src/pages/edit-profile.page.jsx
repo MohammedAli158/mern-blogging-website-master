@@ -162,7 +162,7 @@ setSessionStorage("user", JSON.stringify({
                             </div>
                             <InputBoxComponent name="username" type="text" value={profile_username} placeholder="username" icon="fi-rr-at" />
                             <p className="-mt-3 text-dark-grey" >Username will be used for searching purposes</p>
-                            <textarea className="resize-none input-box h-64 lg:h-40 leading-7 mt-5 pl-5 " maxLength={160} name="bio" value={bio} placeholder="add bio" onChange={handleBioCharacterChange} >
+                            <textarea className="resize-none input-box h-64 lg:h-40 leading-7 mt-5 pl-5 " maxLength={160} name="bio" placeholder="add bio" onChange={handleBioCharacterChange} >
 
                             </textarea>
                             <p>{charactersLeft} characters left</p>

@@ -54,6 +54,14 @@ const Navbar = ()=> {
         fN ()
     }
    },[access_token])
+   const handleWriteOnClick = ()=>{
+
+       if (    userAuth?.access_token === undefined 
+       ) {
+           return toast.error("Please Log in first")
+        }
+    }
+  
     
     return (
         <>
@@ -82,7 +90,7 @@ const Navbar = ()=> {
                          <i className="fi fi-rr-search  "></i>
                     </button>
             </div>
-            <Link to="/editor" className="hidden md:flex gap-2 link" >
+            <Link to="/editor" onClick={handleWriteOnClick} className="hidden md:flex gap-2 link" >
                 <i className="fi fi-rr-file-edit"></i>
                 <p>Write</p>
             </Link>

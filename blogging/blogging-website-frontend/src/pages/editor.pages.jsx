@@ -5,6 +5,7 @@ import { Navigate, useParams } from "react-router-dom"
 import PublishForm from "../components/publish-form.component"
 import Loader from "../components/loader.component"
 import axios from "axios"
+import toast, { Toaster } from "react-hot-toast"
 const blogStructure ={
     title : '',
     banner: '',
@@ -23,8 +24,7 @@ const Editor = () =>{
     let [editorState,setEditorState] = useState("editor")
     let [textEditor,setTextEditor] = useState({ isReady : false })
     let userAuth = useContext(UserContext)
-    console.log(userAuth?.access_token==undefined,"this is log")
-    useEffect(()=>{
+  useEffect(()=>{
 
         if(!blog_id){
             return setLoading(false)
@@ -46,8 +46,8 @@ const Editor = () =>{
     
     return (
         <EditorContext.Provider value={{blog,setBlog,editorState,setEditorState,textEditor,setTextEditor}} >  
+            <Toaster/>
             {
-                userAuth?.access_token==undefined ? <Navigate to="/sign-up"/> : 
                 loading ? <Loader/> : 
                 ( editorState=="editor" ? 
                 <BlogEditor/> : <PublishForm/>)

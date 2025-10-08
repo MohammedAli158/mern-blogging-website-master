@@ -44,6 +44,7 @@ const App = () => {
              <Route path="dashboard" element={<SideNav/>} >
                 <Route path="blogs" element={<BlogManagementPage/>}/>
                 <Route path="notifications" element={<Notifications/>}/>
+                <Route path="editor" element={<Editor />} />
             </Route>
             <Route index element={<HomePage/>} />
             <Route path="sign-in" element={ <UserAuthForm type="sign-in" />} />
