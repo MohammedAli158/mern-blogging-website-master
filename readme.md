@@ -13,6 +13,7 @@ Notifications: Real-time notifications for new comments, likes, and replies, acc
 Clean, organized, and built for a smooth user experience.
 
 #the directory structure used
+```
 ├── .gitignore
 ├── blogging
 │   ├── Readme.md
@@ -91,5 +92,5 @@ Clean, organized, and built for a smooth user experience.
 │       ├── requests.rest
 │       └── server.js
 ├── license.md
-└── readme.md
+└── readme.md ```
 
