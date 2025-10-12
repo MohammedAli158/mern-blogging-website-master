@@ -12,85 +12,84 @@ Similar Blogs Section: Displays related blogs below each blog post to enhance di
 Notifications: Real-time notifications for new comments, likes, and replies, accessible via the dashboard or the navbar notification icon.
 Clean, organized, and built for a smooth user experience.
 
-#the directory structure used 
+#the directory structure used
 ├── .gitignore
 ├── blogging
-    ├── Readme.md
-    ├── blogging-website-frontend
-    │   ├── README.md
-    │   ├── index.html
-    │   ├── package-lock.json
-    │   ├── package.json
-    │   ├── postcss.config.js
-    │   ├── src
-    │   │   ├── App.jsx
-    │   │   ├── common
-    │   │   │   ├── date.jsx
-    │   │   │   ├── firebase.jsx
-    │   │   │   ├── page-animation.jsx
-    │   │   │   └── session.jsx
-    │   │   ├── components
-    │   │   │   ├── about.component.jsx
-    │   │   │   ├── blog-content.component.jsx
-    │   │   │   ├── blog-editor.component.jsx
-    │   │   │   ├── blog-interaction.component.jsx
-    │   │   │   ├── blog-post.component.jsx
-    │   │   │   ├── comment-card.component.jsx
-    │   │   │   ├── comment-field.component.jsx
-    │   │   │   ├── comments.component.jsx
-    │   │   │   ├── inpage-navigation.component.jsx
-    │   │   │   ├── input.component.jsx
-    │   │   │   ├── load-more.component.jsx
-    │   │   │   ├── loader.component.jsx
-    │   │   │   ├── manage-blogcard.component.jsx
-    │   │   │   ├── navbar.component.jsx
-    │   │   │   ├── nobanner-blog-post.component.jsx
-    │   │   │   ├── nodata.component.jsx
-    │   │   │   ├── notification-card.component.jsx
-    │   │   │   ├── notification-comment-field.component.jsx
-    │   │   │   ├── pageArray.component.jsx
-    │   │   │   ├── publish-form.component.jsx
-    │   │   │   ├── sidenavbar.component.jsx
-    │   │   │   ├── tags.component.jsx
-    │   │   │   ├── tools.component.jsx
-    │   │   │   ├── user-navigation.component.jsx
-    │   │   │   └── usercard.component.jsx
-    │   │   ├── imgs
-    │   │   │   ├── 404.png
-    │   │   │   ├── blog banner.png
-    │   │   │   ├── full-logo.png
-    │   │   │   ├── google.png
-    │   │   │   ├── logo.png
-    │   │   │   └── user profile.png
-    │   │   ├── index.css
-    │   │   ├── main.jsx
-    │   │   ├── pages
-    │   │   │   ├── 404.page.jsx
-    │   │   │   ├── blog.page.jsx
-    │   │   │   ├── change-password.page.jsx
-    │   │   │   ├── edit-profile.page.jsx
-    │   │   │   ├── editor.pages.jsx
-    │   │   │   ├── home.page.jsx
-    │   │   │   ├── manage-blogs.page.jsx
-    │   │   │   ├── notifications.page.jsx
-    │   │   │   ├── profile.page.jsx
-    │   │   │   ├── search.page.jsx
-    │   │   │   └── userAuthForm.page.jsx
-    │   │   └── regex.txt
-    │   ├── tailwind.config.js
-    │   └── vite.config.js
-    └── server
-    │   ├── CommentClass.js
-    │   ├── Schema
-    │       ├── Blog.js
-    │       ├── Comment.js
-    │       ├── Notification.js
-    │       └── User.js
-    │   ├── package-lock.json
-    │   ├── package.json
-    │   ├── requests.rest
-    │   └── server.js
-
-
+│   ├── Readme.md
+│   ├── blogging-website-frontend
+│   │   ├── README.md
+│   │   ├── index.html
+│   │   ├── package-lock.json
+│   │   ├── package.json
+│   │   ├── postcss.config.js
+│   │   ├── src
+│   │   │   ├── App.jsx
+│   │   │   ├── common
+│   │   │   │   ├── date.jsx
+│   │   │   │   ├── firebase.jsx
+│   │   │   │   ├── page-animation.jsx
+│   │   │   │   └── session.jsx
+│   │   │   ├── components
+│   │   │   │   ├── about.component.jsx
+│   │   │   │   ├── blog-content.component.jsx
+│   │   │   │   ├── blog-editor.component.jsx
+│   │   │   │   ├── blog-interaction.component.jsx
+│   │   │   │   ├── blog-post.component.jsx
+│   │   │   │   ├── comment-card.component.jsx
+│   │   │   │   ├── comment-field.component.jsx
+│   │   │   │   ├── comments.component.jsx
+│   │   │   │   ├── inpage-navigation.component.jsx
+│   │   │   │   ├── input.component.jsx
+│   │   │   │   ├── load-more.component.jsx
+│   │   │   │   ├── loader.component.jsx
+│   │   │   │   ├── manage-blogcard.component.jsx
+│   │   │   │   ├── navbar.component.jsx
+│   │   │   │   ├── nobanner-blog-post.component.jsx
+│   │   │   │   ├── nodata.component.jsx
+│   │   │   │   ├── notification-card.component.jsx
+│   │   │   │   ├── notification-comment-field.component.jsx
+│   │   │   │   ├── pageArray.component.jsx
+│   │   │   │   ├── publish-form.component.jsx
+│   │   │   │   ├── sidenavbar.component.jsx
+│   │   │   │   ├── tags.component.jsx
+│   │   │   │   ├── tools.component.jsx
+│   │   │   │   ├── user-navigation.component.jsx
+│   │   │   │   └── usercard.component.jsx
+│   │   │   ├── imgs
+│   │   │   │   ├── 404.png
+│   │   │   │   ├── blog banner.png
+│   │   │   │   ├── full-logo.png
+│   │   │   │   ├── google.png
+│   │   │   │   ├── logo.png
+│   │   │   │   └── user profile.png
+│   │   │   ├── index.css
+│   │   │   ├── main.jsx
+│   │   │   ├── pages
+│   │   │   │   ├── 404.page.jsx
+│   │   │   │   ├── blog.page.jsx
+│   │   │   │   ├── change-password.page.jsx
+│   │   │   │   ├── edit-profile.page.jsx
+│   │   │   │   ├── editor.pages.jsx
+│   │   │   │   ├── home.page.jsx
+│   │   │   │   ├── manage-blogs.page.jsx
+│   │   │   │   ├── notifications.page.jsx
+│   │   │   │   ├── profile.page.jsx
+│   │   │   │   ├── search.page.jsx
+│   │   │   │   └── userAuthForm.page.jsx
+│   │   │   └── regex.txt
+│   │   ├── tailwind.config.js
+│   │   └── vite.config.js
+│   └── server
+│       ├── CommentClass.js
+│       ├── Schema
+│       │   ├── Blog.js
+│       │   ├── Comment.js
+│       │   ├── Notification.js
+│       │   └── User.js
+│       ├── package-lock.json
+│       ├── package.json
+│       ├── requests.rest
+│       └── server.js
 ├── license.md
 └── readme.md
+
