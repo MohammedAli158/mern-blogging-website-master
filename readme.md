@@ -1,16 +1,16 @@
 # mern-blogging-website-master
 This is a blog creating website developed using mern stack and is fully functional and working having working notification system and more
-Features:\n
-Google Authentication: Secure login and signup using Google OAuth.\n
-Image Uploading: Users can upload and manage images within their blogs.\n
-Blog Management: Create, edit, and delete blogs with full CRUD functionality.\n
-Engagement System: Like blogs, comment on them, reply to comments (supports infinite nesting), and remove comments when needed.\n
-User Dashboard: Manage drafts, published blogs, and delete unwanted posts easily.\n
-Search Functionality: Search across blogs and users; results dynamically match the query.\n
-Trending & Tag Filtering: Blogs are ranked and shown as trending based on engagement (likes, comments, replies). Users can also filter blogs by tags.\n
-Similar Blogs Section: Displays related blogs below each blog post to enhance discoverability.\n
-Notifications: Real-time notifications for new comments, likes, and replies, accessible via the dashboard or the navbar notification icon.\n
-Clean, organized, and built for a smooth user experience.\n
+Features:
+Google Authentication: Secure login and signup using Google OAuth.
+Image Uploading: Users can upload and manage images within their blogs.
+Blog Management: Create, edit, and delete blogs with full CRUD functionality.
+Engagement System: Like blogs, comment on them, reply to comments (supports infinite nesting), and remove comments when needed.
+User Dashboard: Manage drafts, published blogs, and delete unwanted posts easily.
+Search Functionality: Search across blogs and users; results dynamically match the query.
+Trending & Tag Filtering: Blogs are ranked and shown as trending based on engagement (likes, comments, replies). Users can also filter blogs by tags.
+Similar Blogs Section: Displays related blogs below each blog post to enhance discoverability.
+Notifications: Real-time notifications for new comments, likes, and replies, accessible via the dashboard or the navbar notification icon.
+Clean, organized, and built for a smooth user experience.
 
 #the directory structure used
 ```
