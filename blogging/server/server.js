@@ -183,11 +183,15 @@ server.post("/google-auth", async (req, res) => {
     let { email, name, picture } = decodedUser;
     picture = picture.replace("s96-c", "s384-c");
 
-    let user = await User.findOne({
-      "personal_info.email": email
-    }).select(
-      "personal_info.username personal_info.fullname personal_info.email personal_info.profile_img google_auth"
-    );
+    try {
+        let user = await User.findOne({
+          "personal_info.email": email
+        }).select(
+          "personal_info.username personal_info.fullname personal_info.email personal_info.profile_img google_auth"
+        );
+    } catch (error) {
+        console.log(error)
+    }
 
     if (user) {
       if (!user.google_auth) {
