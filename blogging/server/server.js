@@ -189,16 +189,13 @@ server.post("/google-auth", async (req, res) => {
         }).select(
           "personal_info.username personal_info.fullname personal_info.email personal_info.profile_img google_auth"
         );
-    } catch (error) {
-        console.log(error)
-    }
-
-    if (user) {
+        
+        if (user) {
       if (!user.google_auth) {
         return res
           .status(403)
           .json({ error: "Email already registered, use password login." });
-      }
+        }
     } else {
       const username = await generateUsername(email);
       user = new User({
@@ -213,14 +210,17 @@ server.post("/google-auth", async (req, res) => {
       process.env.JWT_ACCESS_TOKEN_SECRET,
       { expiresIn: process.env.JWT_EXPIRY }
     );
-
+    
     return res.json(SendFrontEnd(user));
-  } catch (err) {
+} catch (err) {
     console.error("Google auth error:", err);
     return res
-      .status(500)
-      .json({ error: "Authentication failed, try another Google account." });
-  }
+    .status(500)
+    .json({ error: "Authentication failed, try another Google account." });
+}
+} catch (error) {
+    console.log
+}
 });
 
 server.post('/editor', upload.fields([
